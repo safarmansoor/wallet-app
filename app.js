@@ -329,6 +329,12 @@ async function loadFromSupabase() {
         console.log('Transactions array:', transactions);
         console.log('Transactions length:', transactions.length);
         
+        // Debug each transaction
+        if (transactions.length > 0) {
+            console.log('First transaction details:', transactions[0]);
+            console.log('Transaction keys:', Object.keys(transactions[0] || {}));
+        }
+        
         transactions.forEach(t => { if (!t.user) t.user = 'renu'; });
         
         if (transactions.length === 0) {
