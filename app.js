@@ -54,6 +54,20 @@ const getTrackUser = () => {
 };
 const setTrackUser = (u) => sessionStorage.setItem('track_user', u);
 
+// Quick login function for one-click access
+function quickLogin(username) {
+    const password = getPassword(username);
+    if (password) {
+        // Set the form values and call doLogin
+        document.getElementById('login-username').value = username;
+        document.getElementById('login-password').value = password;
+        doLogin();
+    } else {
+        const err = document.getElementById('login-error');
+        err.textContent = 'User not found';
+    }
+}
+
 function doLogin() {
     const u = (document.getElementById('login-username').value || '').trim().toLowerCase();
     const p = document.getElementById('login-password').value;

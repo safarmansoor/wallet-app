@@ -70,5 +70,14 @@ button:disabled { background: #ccc; cursor: not-allowed; }
 .login-box h2 { margin: 0 0 20px; text-align: center; font-size: 1.3rem; color: #333; }
 .login-box input { margin-bottom: 15px; }
 .login-error { color: #dc3545; font-size: 0.85rem; margin-bottom: 10px; text-align: center; }
+
+/* Quick Login Styles */
+.quick-login { margin-bottom: 20px; width: 100%; }
+.quick-login h3 { margin: 0 0 10px; font-size: 0.9rem; color: #666; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+.user-buttons { display: flex; gap: 10px; margin-bottom: 15px; }
+.user-btn { flex: 1; padding: 12px; background: #e9ecef; color: #495057; border: none; border-radius: 8px; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+.user-btn:hover { background: #007bff; color: white; transform: translateY(-1px); }
+.divider { text-align: center; color: #999; font-size: 0.8rem; margin: 15px 0; position: relative; }
+.divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #eee; z-index: -1; }
 #app { display: none; }
 #app.visible { display: block; }
