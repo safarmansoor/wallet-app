@@ -4,7 +4,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 // Get Supabase credentials from localStorage or use defaults
-const getSupabaseUrl = () => localStorage.getItem('supabase_url') || '';
+const getSupabaseUrl = () => localStorage.getItem('supabase_url') || 'https://vbifyocsjuljqowptysp.supabase.co';
 const getSupabaseKey = () => localStorage.getItem('supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiaWZ5b2NzanVsanFvd3B0eXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTQ0OTQsImV4cCI6MjA4ODgzMDQ5NH0.ZDYp0Iumr7BOAOF_w4SBaIy0r3JNXBU7hh9DgNbHgmg'
 
 // Initialize Supabase client (only if credentials are available)
@@ -28,7 +28,6 @@ function initializeSupabase() {
 }
 
 let transactions = [];
-let fileSha = null;
 
 // Default users
 const DEFAULT_USERS = { safar: 'safar1997', renu: 'renu' };
