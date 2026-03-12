@@ -297,34 +297,8 @@ function showStatus(msg) { document.getElementById('status-bar').innerText = msg
 async function loadFromGitHub() {
     if (!getPerm(getCurrentUser(), 'read')) { showStatus('No read permission'); return; }
     
-    // Check if Supabase is configured
-    const supabaseUrl = getSetting('supabase_url');
-    const supabaseKey = getSetting('supabase_key');
-    
-    if (supabaseUrl && supabaseKey) {
-        await loadFromSupabase();
-    } else {
-        // Fall back to GitHub
-        const user = getSetting('gh_username'), repo = getSetting('gh_repo'), file = getSetting('gh_filename'), token = getSetting('gh_token');
-        if (!user || !repo || !token) { showStatus('Tap ⚙ to setup GitHub sync'); return; }
-        showStatus('Fetching data...');
-        try {
-            const r = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}`, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
-            if (r.status === 404) { transactions = []; showStatus('New file will be created on first add.'); }
-            else if (r.ok) {
-                const d = await r.json();
-                fileSha = d.sha;
-                let raw = JSON.parse(decodeURIComponent(escape(atob(d.content))));
-                transactions = Array.isArray(raw) ? raw : Object.values(raw).flat();
-                transactions.forEach(t => { if (!t.user) t.user = 'renu'; });
-                showStatus('Synced with GitHub');
-            } else showStatus('Error fetching data');
-            updateUI();
-        } catch (e) {
-            showStatus('Offline / Connection Error');
-            updateUI();
-        }
-    }
+    // Always use Supabase since it's configured in the code
+    await loadFromSupabase();
 }
 
 async function loadFromSupabase() {
@@ -361,41 +335,12 @@ async function loadFromSupabase() {
 }
 
 async function saveToGitHub() {
-    const user = getSetting('gh_username'), repo = getSetting('gh_repo'), file = getSetting('gh_filename'), token = getSetting('gh_token');
     showStatus('Saving...');
     const addBtn = document.getElementById('add-btn');
     if (addBtn) { addBtn.disabled = true; addBtn.innerText = 'Saving...'; }
     
-    // Check if Supabase is configured
-    const supabaseUrl = getSetting('supabase_url');
-    const supabaseKey = getSetting('supabase_key');
-    
-    if (supabaseUrl && supabaseKey) {
-        await saveToSupabase();
-    } else {
-        // Fall back to GitHub
-        if (!user || !repo || !token) { showStatus('Tap ⚙ to setup GitHub sync'); if (addBtn) { addBtn.disabled = false; addBtn.innerText = 'Add Transaction'; } return; }
-        try {
-            const r = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}`, { headers: { 'Authorization': `token ${token}` } });
-            if (r.ok) {
-                const d = await r.json();
-                fileSha = d.sha;
-                let remote = JSON.parse(decodeURIComponent(escape(atob(d.content))));
-                remote = Array.isArray(remote) ? remote : Object.values(remote).flat();
-                const byId = {};
-                remote.forEach(t => { byId[t.id] = t; });
-                transactions.forEach(t => { byId[t.id] = t; });
-                transactions = Object.values(byId);
-            }
-        } catch(e) {}
-        const body = { message: "Update data [skip ci]", content: btoa(unescape(encodeURIComponent(JSON.stringify(transactions)))) };
-        if (fileSha) body.sha = fileSha;
-        try {
-            const r = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${file}`, { method: 'PUT', headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-            if (r.ok) { const d = await r.json(); fileSha = d.content.sha; showStatus('Saved successfully!'); }
-            else showStatus('Save Failed! Check Settings.');
-        } catch(e) { showStatus('Save Error'); }
-    }
+    // Always use Supabase since it's configured in the code
+    await saveToSupabase();
     
     if (addBtn) { addBtn.disabled = false; addBtn.innerText = 'Add Transaction'; }
 }
@@ -501,15 +446,8 @@ function removeTransaction(idx) {
         transactions.splice(idx, 1);
         updateUI();
         
-        // Check if Supabase is configured
-        const supabaseUrl = getSetting('supabase_url');
-        const supabaseKey = getSetting('supabase_key');
-        
-        if (supabaseUrl && supabaseKey) {
-            deleteFromSupabase(transactionId);
-        } else {
-            saveToGitHub();
-        }
+        // Always use Supabase since it's configured in the code
+        deleteFromSupabase(transactionId);
     }
 }
 
