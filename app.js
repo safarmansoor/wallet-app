@@ -55,7 +55,7 @@ const getTrackUser = () => {
 const setTrackUser = (u) => sessionStorage.setItem('track_user', u);
 
 // Quick login function for one-click access
-function quickLogin(username) {
+window.quickLogin = function(username) {
     const password = getPassword(username);
     if (password) {
         // Set the form values and call doLogin
@@ -100,7 +100,7 @@ function doLogin() {
     loadFromGitHub(); // Sync data on login
 }
 
-function logout() {
+window.logout = function() {
     setCurrentUser('');
     transactions = []; // Clear transactions on logout
     // Clear UI
@@ -116,7 +116,7 @@ function logout() {
     toggleSettings();
 }
 
-function showPage(page) {
+window.showPage = function(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('page-' + page).classList.add('active');
@@ -180,7 +180,7 @@ function deleteUser(username) {
     alert('User deleted!');
 }
 
-function saveUser() {
+window.saveUser = function() {
     const username = (document.getElementById('user-username').value || '').trim().toLowerCase();
     const password = document.getElementById('user-password').value;
     if (!username || !password) return alert('Please fill username and password');
@@ -195,7 +195,7 @@ function saveUser() {
     alert('User saved!');
 }
 
-function clearUserForm() {
+window.clearUserForm = function() {
     document.getElementById('user-username').value = '';
     document.getElementById('user-password').value = '';
 }
@@ -250,7 +250,7 @@ function togglePermissions() {
         document.getElementById('permissions-grid').innerHTML = html;
     }
 }
-function savePermissions() {
+window.savePermissions = function() {
     const p = {};
     getUserNames().forEach(u => { p[u] = {}; PERMS.forEach(perm => { p[u][perm] = document.getElementById(`perm-${u}-${perm}`)?.checked ? 1 : 0; }); });
     setPerms(p);
@@ -263,7 +263,7 @@ function savePermissions() {
     updateUI();
 }
 
-function toggleSettings() {
+window.toggleSettings = function() {
     const modal = document.getElementById('settings-modal');
     modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
     if(modal.style.display === 'block') {
@@ -278,7 +278,7 @@ function toggleSettings() {
     }
 }
 
-function saveSettings() {
+window.saveSettings = function() {
     localStorage.setItem('gh_username', document.getElementById('gh-username').value);
     localStorage.setItem('gh_repo', document.getElementById('gh-repo').value);
     localStorage.setItem('gh_filename', document.getElementById('gh-filename').value);
