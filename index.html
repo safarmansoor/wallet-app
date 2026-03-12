@@ -92,6 +92,12 @@
                 <input type="password" id="gh-token" placeholder="Personal Access Token (PAT)" onchange="saveGhSetting()">
                 <button onclick="loadFromGitHub()" style="margin-top: 10px;">Sync Now</button>
             </div>
+            <div class="input-group" style="margin-top: 20px;">
+                <h3 style="margin: 0 0 15px; font-size: 1rem;">Supabase Setup</h3>
+                <input type="text" id="supabase-url" placeholder="Supabase Project URL">
+                <input type="password" id="supabase-key" placeholder="Supabase Anon Key">
+                <button onclick="saveSettings()" style="margin-top: 10px;">Save Supabase Settings</button>
+            </div>
         </div>
         <div id="no-permission-msg" style="display:none; text-align:center; padding:40px; color:#999;">No view permission. Contact admin.</div>
         <div class="settings-btn" onclick="toggleSettings()">⚙</div>
@@ -114,7 +120,7 @@
             </div>
         </div>
     </div>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
         
 </body>
 </html>
