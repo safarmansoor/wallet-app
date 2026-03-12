@@ -4,7 +4,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 // Get Supabase credentials from localStorage or use defaults
-const getSupabaseUrl = () => localStorage.getItem('supabase_url') || 'https://vbifyocsjuljqowptysp.supabase.co';
+const getSupabaseUrl = () => localStorage.getItem('supabase_url') || '';
 const getSupabaseKey = () => localStorage.getItem('supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiaWZ5b2NzanVsanFvd3B0eXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTQ0OTQsImV4cCI6MjA4ODgzMDQ5NH0.ZDYp0Iumr7BOAOF_w4SBaIy0r3JNXBU7hh9DgNbHgmg'
 
 // Initialize Supabase client (only if credentials are available)
@@ -333,6 +333,8 @@ async function loadFromSupabase() {
         
         if (transactions.length === 0) {
             showStatus('Loaded from Supabase (no data found)');
+            // Add sample data for demonstration
+            await addSampleData();
         } else {
             showStatus(`Loaded from Supabase (${transactions.length} transactions)`);
         }
@@ -341,6 +343,77 @@ async function loadFromSupabase() {
     } catch (error) {
         console.error('Supabase error:', error);
         showStatus('Supabase connection failed: ' + error.message);
+    }
+}
+
+async function addSampleData() {
+    try {
+        const sampleTransactions = [
+            {
+                id: Date.now() - 1000000,
+                createdAt: new Date().toISOString(),
+                date: '2024-03-10',
+                type: 'income',
+                desc: 'Salary March',
+                category: 'Salary',
+                amount: '5000',
+                user: 'safar'
+            },
+            {
+                id: Date.now() - 2000000,
+                createdAt: new Date().toISOString(),
+                date: '2024-03-08',
+                type: 'expense',
+                desc: 'Groceries',
+                category: 'Food',
+                amount: '200',
+                user: 'safar'
+            },
+            {
+                id: Date.now() - 3000000,
+                createdAt: new Date().toISOString(),
+                date: '2024-03-05',
+                type: 'expense',
+                desc: 'Gas',
+                category: 'Transport',
+                amount: '100',
+                user: 'safar'
+            },
+            {
+                id: Date.now() - 4000000,
+                createdAt: new Date().toISOString(),
+                date: '2024-03-01',
+                type: 'income',
+                desc: 'Freelance work',
+                category: 'Income',
+                amount: '1000',
+                user: 'renu'
+            },
+            {
+                id: Date.now() - 5000000,
+                createdAt: new Date().toISOString(),
+                date: '2024-02-28',
+                type: 'expense',
+                desc: 'Dinner',
+                category: 'Food',
+                amount: '80',
+                user: 'renu'
+            }
+        ];
+        
+        const { error } = await supabase
+            .from('wallet-app')
+            .insert(sampleTransactions);
+        
+        if (error) {
+            console.error('Error adding sample data:', error);
+        } else {
+            console.log('Sample data added successfully');
+            // Reload data after adding sample data
+            await loadFromSupabase();
+        }
+    } catch (error) {
+        console.error('Error adding sample data:', error);
     }
 }
 
