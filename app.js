@@ -324,9 +324,19 @@ async function loadFromSupabase() {
             return;
         }
         
+        console.log('Supabase data loaded:', data);
         transactions = data || [];
+        console.log('Transactions array:', transactions);
+        console.log('Transactions length:', transactions.length);
+        
         transactions.forEach(t => { if (!t.user) t.user = 'renu'; });
-        showStatus('Loaded from Supabase');
+        
+        if (transactions.length === 0) {
+            showStatus('Loaded from Supabase (no data found)');
+        } else {
+            showStatus(`Loaded from Supabase (${transactions.length} transactions)`);
+        }
+        
         updateUI();
     } catch (error) {
         console.error('Supabase error:', error);
