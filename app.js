@@ -544,6 +544,15 @@ function addTransaction() {
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
+    // Add event listener for login form
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            doLogin();
+        });
+    }
+    
     if (getCurrentUser()) {
         showApp();
     } else {
