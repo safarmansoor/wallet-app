@@ -1,12 +1,8 @@
+// This file is no longer needed as Supabase client is now initialized directly in app.js
+// Keeping for reference and future use if needed
+
 // Import Supabase client
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-// Supabase configuration
-const SUPABASE_URL = 'https://vbifyocsjuljqowptysp.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiaWZ5b2NzanVsanFvd3B0eXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTQ0OTQsImV4cCI6MjA4ODgzMDQ5NH0.ZDYp0Iumr7BOAOF_w4SBaIy0r3JNXBU7hh9DgNbHgmg';
-
-// Initialize Supabase client
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Function to create the wallet-app table structure
 async function createTable() {
@@ -50,4 +46,4 @@ async function migrateData() {
     }
 }
 
-export { supabase, createTable, migrateData };
+export { createTable, migrateData };

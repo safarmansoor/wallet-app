@@ -1,5 +1,12 @@
 // Import Supabase configuration
-import { supabase } from './supabase-config.js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+// Get Supabase credentials from localStorage or use defaults
+const getSupabaseUrl = () => localStorage.getItem('supabase_url') || 'https://vbifyocsjuljqowptysp.supabase.co';
+const getSupabaseKey = () => localStorage.getItem('supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiaWZ5b2NzanVsanFvd3B0eXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTQ0OTQsImV4cCI6MjA4ODgzMDQ5NH0.ZDYp0Iumr7BOAOF_w4SBaIy0r3JNXBU7hh9DgNbHgmg';
+
+// Initialize Supabase client
+const supabase = createClient(getSupabaseUrl(), getSupabaseKey());
 
 let transactions = [];
 let fileSha = null;
@@ -208,6 +215,10 @@ function toggleSettings() {
         document.getElementById('gh-repo').value = getSetting('gh_repo') || '';
         document.getElementById('gh-filename').value = getSetting('gh_filename') || 'data.json';
         document.getElementById('gh-token').value = getSetting('gh_token') || '';
+        
+        // Load Supabase settings
+        document.getElementById('supabase-url').value = getSetting('supabase_url') || '';
+        document.getElementById('supabase-key').value = getSetting('supabase_key') || '';
     }
 }
 
