@@ -2,11 +2,22 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 // Get Supabase credentials from localStorage or use defaults
-const getSupabaseUrl = () => localStorage.getItem('supabase_url') || 'YOUR_SUPABASE_PROJECT_URL';
-const getSupabaseKey = () => localStorage.getItem('supabase_key') || 'YOUR_SUPABASE_ANON_KEY';
+const getSupabaseUrl = () => localStorage.getItem('supabase_url') || 'https://vbifyocsjuljqowptysp.supabase.co';
+const getSupabaseKey = () => localStorage.getItem('supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiaWZ5b2NzanVsanFvd3B0eXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTQ0OTQsImV4cCI6MjA4ODgzMDQ5NH0.ZDYp0Iumr7BOAOF_w4SBaIy0r3JNXBU7hh9DgNbHgmg';
 
-// Initialize Supabase client
-const supabase = createClient(getSupabaseUrl(), getSupabaseKey());
+// Initialize Supabase client (only if credentials are available)
+let supabase = null;
+
+function initializeSupabase() {
+    const url = getSupabaseUrl();
+    const key = getSupabaseKey();
+    
+    if (url && key && url.startsWith('http')) {
+        supabase = createClient(url, key);
+        return true;
+    }
+    return false;
+}
 
 let transactions = [];
 let fileSha = null;
@@ -276,6 +287,15 @@ async function loadFromGitHub() {
 
 async function loadFromSupabase() {
     try {
+        // Initialize Supabase if not already done
+        if (!supabase) {
+            const initialized = initializeSupabase();
+            if (!initialized) {
+                showStatus('Supabase not configured');
+                return;
+            }
+        }
+        
         showStatus('Loading from Supabase...');
         const { data, error } = await supabase
             .from('wallet-app')
@@ -340,6 +360,15 @@ async function saveToGitHub() {
 
 async function saveToSupabase() {
     try {
+        // Initialize Supabase if not already done
+        if (!supabase) {
+            const initialized = initializeSupabase();
+            if (!initialized) {
+                showStatus('Supabase not configured');
+                return;
+            }
+        }
+        
         showStatus('Saving to Supabase...');
         const latestTransaction = transactions[transactions.length - 1];
         
@@ -444,6 +473,15 @@ function removeTransaction(idx) {
 
 async function deleteFromSupabase(transactionId) {
     try {
+        // Initialize Supabase if not already done
+        if (!supabase) {
+            const initialized = initializeSupabase();
+            if (!initialized) {
+                showStatus('Supabase not configured');
+                return;
+            }
+        }
+        
         showStatus('Deleting from Supabase...');
         const { error } = await supabase
             .from('wallet-app')
