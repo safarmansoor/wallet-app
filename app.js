@@ -2,8 +2,8 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 // Get Supabase credentials from localStorage or use defaults
-const getSupabaseUrl = () => localStorage.getItem('supabase_url') || 'https://vbifyocsjuljqowptysp.supabase.co';
-const getSupabaseKey = () => localStorage.getItem('supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiaWZ5b2NzanVsanFvd3B0eXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTQ0OTQsImV4cCI6MjA4ODgzMDQ5NH0.ZDYp0Iumr7BOAOF_w4SBaIy0r3JNXBU7hh9DgNbHgmg';
+const getSupabaseUrl = () => localStorage.getItem('supabase_url') || '';
+const getSupabaseKey = () => localStorage.getItem('supabase_key') || '';
 
 // Initialize Supabase client (only if credentials are available)
 let supabase = null;
@@ -13,8 +13,14 @@ function initializeSupabase() {
     const key = getSupabaseKey();
     
     if (url && key && url.startsWith('http')) {
-        supabase = createClient(url, key);
-        return true;
+        try {
+            supabase = createClient(url, key);
+            console.log('Supabase initialized successfully');
+            return true;
+        } catch (error) {
+            console.error('Supabase initialization error:', error);
+            return false;
+        }
     }
     return false;
 }
@@ -304,7 +310,7 @@ async function loadFromSupabase() {
         
         if (error) {
             console.error('Supabase error:', error);
-            showStatus('Supabase connection failed');
+            showStatus('Supabase connection failed: ' + error.message);
             return;
         }
         
@@ -314,7 +320,7 @@ async function loadFromSupabase() {
         updateUI();
     } catch (error) {
         console.error('Supabase error:', error);
-        showStatus('Supabase connection failed');
+        showStatus('Supabase connection failed: ' + error.message);
     }
 }
 
@@ -378,14 +384,14 @@ async function saveToSupabase() {
         
         if (error) {
             console.error('Supabase save error:', error);
-            showStatus('Supabase save failed');
+            showStatus('Supabase save failed: ' + error.message);
             return;
         }
         
         showStatus('Saved to Supabase');
     } catch (error) {
         console.error('Supabase save error:', error);
-        showStatus('Supabase save failed');
+        showStatus('Supabase save failed: ' + error.message);
     }
 }
 
@@ -490,14 +496,14 @@ async function deleteFromSupabase(transactionId) {
         
         if (error) {
             console.error('Supabase delete error:', error);
-            showStatus('Supabase delete failed');
+            showStatus('Supabase delete failed: ' + error.message);
             return;
         }
         
         showStatus('Deleted from Supabase');
     } catch (error) {
         console.error('Supabase delete error:', error);
-        showStatus('Supabase delete failed');
+        showStatus('Supabase delete failed: ' + error.message);
     }
 }
 
