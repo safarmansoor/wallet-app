@@ -167,6 +167,9 @@ function showApp() {
         // Non-admin users see only their own transactions
         setTrackUser(u);
     }
+    
+    // Initialize UI with current data
+    updateUI();
 }
 function switchTrackUser() {
     if (!isAdmin()) return;
@@ -473,5 +476,12 @@ function addTransaction() {
     setToday();
 }
 
-if (getCurrentUser()) showApp();
+// Initialize the app
+if (getCurrentUser()) {
+    showApp();
+} else {
+    // Show login screen by default
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('app').classList.remove('visible');
+}
 setToday();
