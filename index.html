@@ -35,9 +35,10 @@
             <h1>Wallet</h1>
             <select id="user-select" onchange="switchTrackUser()" title="Track for user"></select>
             <nav class="app-nav">
-                <button id="nav-dashboard" class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
-                <button id="nav-reports" class="nav-btn" onclick="showPage('reports')">Reports</button>
-                <button id="nav-users" class="nav-btn" onclick="showPage('users')" style="display:none;">Users</button>
+            <button id="nav-dashboard" class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
+            <button id="nav-reports" class="nav-btn" onclick="showPage('reports')">Reports</button>
+            <button id="nav-users" class="nav-btn" onclick="showPage('users')" style="display:none;">Users</button>
+            <button id="nav-all-data" class="nav-btn" onclick="showPage('all-data')" style="display:none;">All Data</button>
             </nav>
             
         </header>
@@ -92,6 +93,15 @@
                     <button onclick="clearUserForm()" style="flex: 1; background: #6c757d;">Clear</button>
                 </div>
             </div>
+        </div>
+        <div id="page-all-data" class="page">
+            <div class="list-header">All Data from wallet-app Table</div>
+            <div class="data-controls">
+                <button onclick="loadAllData()" style="margin-bottom: 10px;">Refresh Data</button>
+                <button onclick="exportData()" style="margin-bottom: 10px; background: #28a745;">Export CSV</button>
+                <span id="data-count" style="margin-left: 10px; font-size: 0.9rem; color: #666;"></span>
+            </div>
+            <div id="all-data-list"></div>
         </div>
         <div id="no-permission-msg" style="display:none; text-align:center; padding:40px; color:#999;">No view permission. Contact admin.</div>
         <div class="settings-btn" onclick="toggleSettings()">⚙</div>
