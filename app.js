@@ -2,8 +2,8 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 // Get Supabase credentials from localStorage or use defaults
-const getSupabaseUrl = () => localStorage.getItem('supabase_url') || 'https://vbifyocsjuljqowptysp.supabase.co';
-const getSupabaseKey = () => localStorage.getItem('supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiaWZ5b2NzanVsanFvd3B0eXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNTQ0OTQsImV4cCI6MjA4ODgzMDQ5NH0.ZDYp0Iumr7BOAOF_w4SBaIy0r3JNXBU7hh9DgNbHgmg';
+const getSupabaseUrl = () => localStorage.getItem('supabase_url') || 'YOUR_SUPABASE_PROJECT_URL';
+const getSupabaseKey = () => localStorage.getItem('supabase_key') || 'YOUR_SUPABASE_ANON_KEY';
 
 // Initialize Supabase client
 const supabase = createClient(getSupabaseUrl(), getSupabaseKey());
@@ -477,11 +477,13 @@ function addTransaction() {
 }
 
 // Initialize the app
-if (getCurrentUser()) {
-    showApp();
-} else {
-    // Show login screen by default
-    document.getElementById('login-screen').classList.remove('hidden');
-    document.getElementById('app').classList.remove('visible');
-}
-setToday();
+document.addEventListener('DOMContentLoaded', function() {
+    if (getCurrentUser()) {
+        showApp();
+    } else {
+        // Show login screen by default
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('app').classList.remove('visible');
+    }
+    setToday();
+});
