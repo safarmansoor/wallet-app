@@ -1,3 +1,5 @@
+
+
 // Import Supabase configuration
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
@@ -56,7 +58,27 @@ function doLogin() {
     const u = (document.getElementById('login-username').value || '').trim().toLowerCase();
     const p = document.getElementById('login-password').value;
     const err = document.getElementById('login-error');
-    if (!getUserNames().includes(u) || getPassword(u) !== p) { err.textContent = 'Invalid username or password'; return; }
+    
+    // Debug logging
+    console.log('Login attempt:', { username: u, password: p ? '***' : '', allUsers: getUserNames() });
+    
+    // Check if user exists in either default users or custom users
+    const allUsers = getUserNames();
+    if (!allUsers.includes(u)) {
+        err.textContent = 'Invalid username or password';
+        console.log('User not found in:', allUsers);
+        return;
+    }
+    
+    // Get the correct password for this user
+    const correctPassword = getPassword(u);
+    console.log('Password check:', { correctPassword: correctPassword ? '***' : 'undefined', inputPassword: p ? '***' : '' });
+    
+    if (!correctPassword || correctPassword !== p) {
+        err.textContent = 'Invalid username or password';
+        return;
+    }
+    
     err.textContent = '';
     setCurrentUser(u);
     setTrackUser(u);
