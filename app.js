@@ -332,9 +332,13 @@ async function loadFromSupabase() {
         transactions.forEach(t => { if (!t.user) t.user = 'renu'; });
         
         if (transactions.length === 0) {
-            showStatus('Loaded from Supabase (no data found)');
-            // Add sample data for demonstration
-            await addSampleData();
+            showStatus('No transactions found. Add your first transaction below!');
+            // Clear any existing UI elements that might be showing old data
+            document.getElementById('history-list').innerHTML = '';
+            document.getElementById('total-asset').innerText = '0.00 AED';
+            document.getElementById('total-inc').innerText = '0.00 AED';
+            document.getElementById('total-exp').innerText = '0.00 AED';
+            document.getElementById('total-balance').innerText = '0.00 AED';
         } else {
             showStatus(`Loaded from Supabase (${transactions.length} transactions)`);
         }
