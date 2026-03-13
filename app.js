@@ -1,24 +1,24 @@
 // Import Supabase configuration
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// Get Supabase credentials from localStorage or use defaults
-const getSupabaseUrl = () => localStorage.getItem('supabase_url') || '';
-const getSupabaseKey = () => localStorage.getItem('supabase_key') || '';
+// Get Neon database credentials from localStorage or use defaults
+const getNeonUrl = () => localStorage.getItem('neon_url') || '';
+const getNeonKey = () => localStorage.getItem('neon_key') || '';
 
-// Initialize Supabase client (only if credentials are available)
-let supabase = null;
+// Initialize Neon database client (only if credentials are available)
+let neon = null;
 
-function initializeSupabase() {
-    const url = getSupabaseUrl();
-    const key = getSupabaseKey();
+function initializeNeon() {
+    const url = getNeonUrl();
+    const key = getNeonKey();
     
     if (url && key && url.startsWith('http')) {
         try {
-            supabase = createClient(url, key);
-            console.log('Supabase initialized successfully');
+            neon = createClient(url, key);
+            console.log('Neon database initialized successfully');
             return true;
         } catch (error) {
-            console.error('Supabase initialization error:', error);
+            console.error('Neon database initialization error:', error);
             return false;
         }
     }
@@ -236,9 +236,9 @@ function toggleSettings() {
         document.getElementById('gh-filename').value = getSetting('gh_filename') || 'data.json';
         document.getElementById('gh-token').value = getSetting('gh_token') || '';
         
-        // Load Supabase settings
-        document.getElementById('supabase-url').value = getSetting('supabase_url') || '';
-        document.getElementById('supabase-key').value = getSetting('supabase_key') || '';
+        // Load Neon database settings
+        document.getElementById('neon-url').value = getSetting('neon_url') || '';
+        document.getElementById('neon-key').value = getSetting('neon_key') || '';
     }
 }
 
@@ -248,9 +248,9 @@ function saveSettings() {
     localStorage.setItem('gh_filename', document.getElementById('gh-filename').value);
     localStorage.setItem('gh_token', document.getElementById('gh-token').value);
     
-    // Save Supabase settings
-    localStorage.setItem('supabase_url', document.getElementById('supabase-url').value);
-    localStorage.setItem('supabase_key', document.getElementById('supabase-key').value);
+    // Save Neon database settings
+    localStorage.setItem('neon_url', document.getElementById('neon-url').value);
+    localStorage.setItem('neon_key', document.getElementById('neon-key').value);
     
     toggleSettings();
     loadFromGitHub();
@@ -261,12 +261,12 @@ function showStatus(msg) { document.getElementById('status-bar').innerText = msg
 async function loadFromGitHub() {
     if (!getPerm(getCurrentUser(), 'read')) { showStatus('No read permission'); return; }
     
-    // Check if Supabase is configured
-    const supabaseUrl = getSetting('supabase_url');
-    const supabaseKey = getSetting('supabase_key');
+    // Check if Neon database is configured
+    const neonUrl = getSetting('neon_url');
+    const neonKey = getSetting('neon_key');
     
-    if (supabaseUrl && supabaseKey) {
-        await loadFromSupabase();
+    if (neonUrl && neonKey) {
+        await loadFromNeon();
     } else {
         // Fall back to GitHub
         const user = getSetting('gh_username'), repo = getSetting('gh_repo'), file = getSetting('gh_filename'), token = getSetting('gh_token');
@@ -321,6 +321,9 @@ async function loadFromSupabase() {
     } catch (error) {
         console.error('Supabase error:', error);
         showStatus('Supabase connection failed: ' + error.message);
+        // Fallback to empty data if Supabase fails
+        transactions = [];
+        updateUI();
     }
 }
 
@@ -330,12 +333,12 @@ async function saveToGitHub() {
     const addBtn = document.getElementById('add-btn');
     if (addBtn) { addBtn.disabled = true; addBtn.innerText = 'Saving...'; }
     
-    // Check if Supabase is configured
-    const supabaseUrl = getSetting('supabase_url');
-    const supabaseKey = getSetting('supabase_key');
+    // Check if Neon database is configured
+    const neonUrl = getSetting('neon_url');
+    const neonKey = getSetting('neon_key');
     
-    if (supabaseUrl && supabaseKey) {
-        await saveToSupabase();
+    if (neonUrl && neonKey) {
+        await saveToNeon();
     } else {
         // Fall back to GitHub
         if (!user || !repo || !token) { showStatus('Tap ⚙ to setup GitHub sync'); if (addBtn) { addBtn.disabled = false; addBtn.innerText = 'Add Transaction'; } return; }
@@ -392,6 +395,9 @@ async function saveToSupabase() {
     } catch (error) {
         console.error('Supabase save error:', error);
         showStatus('Supabase save failed: ' + error.message);
+        // Fallback to GitHub if Supabase fails
+        showStatus('Falling back to GitHub sync...');
+        await saveToGitHub();
     }
 }
 
@@ -465,12 +471,12 @@ function removeTransaction(idx) {
         transactions.splice(idx, 1);
         updateUI();
         
-        // Check if Supabase is configured
-        const supabaseUrl = getSetting('supabase_url');
-        const supabaseKey = getSetting('supabase_key');
+        // Check if Neon database is configured
+        const neonUrl = getSetting('neon_url');
+        const neonKey = getSetting('neon_key');
         
-        if (supabaseUrl && supabaseKey) {
-            deleteFromSupabase(transactionId);
+        if (neonUrl && neonKey) {
+            deleteFromNeon(transactionId);
         } else {
             saveToGitHub();
         }
@@ -504,6 +510,112 @@ async function deleteFromSupabase(transactionId) {
     } catch (error) {
         console.error('Supabase delete error:', error);
         showStatus('Supabase delete failed: ' + error.message);
+        // Fallback to GitHub if Supabase fails
+        showStatus('Falling back to GitHub sync...');
+        await saveToGitHub();
+    }
+}
+
+async function loadFromNeon() {
+    try {
+        // Initialize Neon if not already done
+        if (!neon) {
+            const initialized = initializeNeon();
+            if (!initialized) {
+                showStatus('Neon database not configured');
+                return;
+            }
+        }
+        
+        showStatus('Loading from Neon database...');
+        const { data, error } = await neon
+            .from('wallet-app')
+            .select('*')
+            .order('date', { ascending: false });
+        
+        if (error) {
+            console.error('Neon database error:', error);
+            showStatus('Neon database connection failed: ' + error.message);
+            return;
+        }
+        
+        transactions = data || [];
+        transactions.forEach(t => { if (!t.user) t.user = 'renu'; });
+        showStatus('Loaded from Neon database');
+        updateUI();
+    } catch (error) {
+        console.error('Neon database error:', error);
+        showStatus('Neon database connection failed: ' + error.message);
+        // Fallback to empty data if Neon fails
+        transactions = [];
+        updateUI();
+    }
+}
+
+async function saveToNeon() {
+    try {
+        // Initialize Neon if not already done
+        if (!neon) {
+            const initialized = initializeNeon();
+            if (!initialized) {
+                showStatus('Neon database not configured');
+                return;
+            }
+        }
+        
+        showStatus('Saving to Neon database...');
+        const latestTransaction = transactions[transactions.length - 1];
+        
+        const { data, error } = await neon
+            .from('wallet-app')
+            .upsert(latestTransaction, { onConflict: 'id' });
+        
+        if (error) {
+            console.error('Neon database save error:', error);
+            showStatus('Neon database save failed: ' + error.message);
+            return;
+        }
+        
+        showStatus('Saved to Neon database');
+    } catch (error) {
+        console.error('Neon database save error:', error);
+        showStatus('Neon database save failed: ' + error.message);
+        // Fallback to GitHub if Neon fails
+        showStatus('Falling back to GitHub sync...');
+        await saveToGitHub();
+    }
+}
+
+async function deleteFromNeon(transactionId) {
+    try {
+        // Initialize Neon if not already done
+        if (!neon) {
+            const initialized = initializeNeon();
+            if (!initialized) {
+                showStatus('Neon database not configured');
+                return;
+            }
+        }
+        
+        showStatus('Deleting from Neon database...');
+        const { error } = await neon
+            .from('wallet-app')
+            .delete()
+            .eq('id', transactionId);
+        
+        if (error) {
+            console.error('Neon database delete error:', error);
+            showStatus('Neon database delete failed: ' + error.message);
+            return;
+        }
+        
+        showStatus('Deleted from Neon database');
+    } catch (error) {
+        console.error('Neon database delete error:', error);
+        showStatus('Neon database delete failed: ' + error.message);
+        // Fallback to GitHub if Neon fails
+        showStatus('Falling back to GitHub sync...');
+        await saveToGitHub();
     }
 }
 
