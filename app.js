@@ -4,8 +4,8 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 // Get Neon database credentials from localStorage or use defaults
-const getNeonUrl = () => localStorage.getItem('neon_url') || 'postgresql://neondb_owner:npg_Lu4vzeYQMxI1@ep-frosty-art-amxbq30z-pooler.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
-const getNeonKey = () => localStorage.getItem('neon_key') || 'napi_1gm6hy5pf7pt0ggf9eo24p33iowd28hfa5p0i82oy1ahj8kr3lws7ifcpxonjnve';
+const getNeonUrl = () => localStorage.getItem('neon_url') || '';
+const getNeonKey = () => localStorage.getItem('neon_key') || '';
 
 // Initialize Neon database client (only if credentials are available)
 let neon = null;
@@ -13,6 +13,8 @@ let neon = null;
 function initializeNeon() {
     const url = getNeonUrl();
     const key = getNeonKey();
+    
+    console.log('Neon initialization attempt:', { url: url ? '***' : 'empty', key: key ? '***' : 'empty' });
     
     if (url && key && url.startsWith('http')) {
         try {
@@ -23,8 +25,10 @@ function initializeNeon() {
             console.error('Neon database initialization error:', error);
             return false;
         }
+    } else {
+        console.log('Neon credentials missing or invalid URL');
+        return false;
     }
-    return false;
 }
 
 let transactions = [];
