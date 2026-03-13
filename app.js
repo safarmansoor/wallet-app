@@ -1,3 +1,5 @@
+
+
 // Import Supabase configuration
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
@@ -26,7 +28,6 @@ function initializeNeon() {
 }
 
 let transactions = [];
-let fileSha = null;
 
 // Default users
 const DEFAULT_USERS = { safar: 'safar1997', renu: 'renu' };
@@ -52,11 +53,45 @@ const getTrackUser = () => {
 };
 const setTrackUser = (u) => sessionStorage.setItem('track_user', u);
 
+// Quick login function for one-click access
+window.quickLogin = function(username) {
+    const password = getPassword(username);
+    if (password) {
+        // Set the form values and call doLogin
+        document.getElementById('login-username').value = username;
+        document.getElementById('login-password').value = password;
+        doLogin();
+    } else {
+        const err = document.getElementById('login-error');
+        err.textContent = 'User not found';
+    }
+}
+
 function doLogin() {
     const u = (document.getElementById('login-username').value || '').trim().toLowerCase();
     const p = document.getElementById('login-password').value;
     const err = document.getElementById('login-error');
-    if (!getUserNames().includes(u) || getPassword(u) !== p) { err.textContent = 'Invalid username or password'; return; }
+    
+    // Debug logging
+    console.log('Login attempt:', { username: u, password: p ? '***' : '', allUsers: getUserNames() });
+    
+    // Check if user exists in either default users or custom users
+    const allUsers = getUserNames();
+    if (!allUsers.includes(u)) {
+        err.textContent = 'Invalid username or password';
+        console.log('User not found in:', allUsers);
+        return;
+    }
+    
+    // Get the correct password for this user
+    const correctPassword = getPassword(u);
+    console.log('Password check:', { correctPassword: correctPassword ? '***' : 'undefined', inputPassword: p ? '***' : '' });
+    
+    if (!correctPassword || correctPassword !== p) {
+        err.textContent = 'Invalid username or password';
+        return;
+    }
+    
     err.textContent = '';
     setCurrentUser(u);
     setTrackUser(u);
@@ -64,7 +99,7 @@ function doLogin() {
     loadFromGitHub(); // Sync data on login
 }
 
-function logout() {
+window.logout = function() {
     setCurrentUser('');
     transactions = []; // Clear transactions on logout
     // Clear UI
@@ -80,7 +115,7 @@ function logout() {
     toggleSettings();
 }
 
-function showPage(page) {
+window.showPage = function(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('page-' + page).classList.add('active');
@@ -88,6 +123,9 @@ function showPage(page) {
     if (page === 'users') {
         renderUserList();
         loadGhSettings();
+    }
+    if (page === 'all-data') {
+        loadAllData();
     }
 }
 
@@ -144,7 +182,7 @@ function deleteUser(username) {
     alert('User deleted!');
 }
 
-function saveUser() {
+window.saveUser = function() {
     const username = (document.getElementById('user-username').value || '').trim().toLowerCase();
     const password = document.getElementById('user-password').value;
     if (!username || !password) return alert('Please fill username and password');
@@ -159,7 +197,7 @@ function saveUser() {
     alert('User saved!');
 }
 
-function clearUserForm() {
+window.clearUserForm = function() {
     document.getElementById('user-username').value = '';
     document.getElementById('user-password').value = '';
 }
@@ -214,7 +252,7 @@ function togglePermissions() {
         document.getElementById('permissions-grid').innerHTML = html;
     }
 }
-function savePermissions() {
+window.savePermissions = function() {
     const p = {};
     getUserNames().forEach(u => { p[u] = {}; PERMS.forEach(perm => { p[u][perm] = document.getElementById(`perm-${u}-${perm}`)?.checked ? 1 : 0; }); });
     setPerms(p);
@@ -227,7 +265,7 @@ function savePermissions() {
     updateUI();
 }
 
-function toggleSettings() {
+window.toggleSettings = function() {
     const modal = document.getElementById('settings-modal');
     modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
     if(modal.style.display === 'block') {
@@ -242,7 +280,7 @@ function toggleSettings() {
     }
 }
 
-function saveSettings() {
+window.saveSettings = function() {
     localStorage.setItem('gh_username', document.getElementById('gh-username').value);
     localStorage.setItem('gh_repo', document.getElementById('gh-repo').value);
     localStorage.setItem('gh_filename', document.getElementById('gh-filename').value);
@@ -314,9 +352,31 @@ async function loadFromSupabase() {
             return;
         }
         
+        console.log('Supabase data loaded:', data);
         transactions = data || [];
+        console.log('Transactions array:', transactions);
+        console.log('Transactions length:', transactions.length);
+        
+        // Debug each transaction
+        if (transactions.length > 0) {
+            console.log('First transaction details:', transactions[0]);
+            console.log('Transaction keys:', Object.keys(transactions[0] || {}));
+        }
+        
         transactions.forEach(t => { if (!t.user) t.user = 'renu'; });
-        showStatus('Loaded from Supabase');
+        
+        if (transactions.length === 0) {
+            showStatus('No transactions found. Add your first transaction below!');
+            // Clear any existing UI elements that might be showing old data
+            document.getElementById('history-list').innerHTML = '';
+            document.getElementById('total-asset').innerText = '0.00 AED';
+            document.getElementById('total-inc').innerText = '0.00 AED';
+            document.getElementById('total-exp').innerText = '0.00 AED';
+            document.getElementById('total-balance').innerText = '0.00 AED';
+        } else {
+            showStatus(`Loaded from Supabase (${transactions.length} transactions)`);
+        }
+        
         updateUI();
     } catch (error) {
         console.error('Supabase error:', error);
@@ -328,7 +388,6 @@ async function loadFromSupabase() {
 }
 
 async function saveToGitHub() {
-    const user = getSetting('gh_username'), repo = getSetting('gh_repo'), file = getSetting('gh_filename'), token = getSetting('gh_token');
     showStatus('Saving...');
     const addBtn = document.getElementById('add-btn');
     if (addBtn) { addBtn.disabled = true; addBtn.innerText = 'Saving...'; }
@@ -632,8 +691,218 @@ function addTransaction() {
     setToday();
 }
 
+// All Data Page Functions
+async function loadAllData() {
+    if (!getPerm(getCurrentUser(), 'read')) { 
+        showStatus('No read permission'); 
+        document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#999;">No permission to view data</p>';
+        return; 
+    }
+    
+    showStatus('Loading all data...');
+    document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#666;">Loading...</p>';
+    
+    try {
+        // Initialize Supabase if not already done
+        if (!supabase) {
+            const initialized = initializeSupabase();
+            if (!initialized) {
+                showStatus('Supabase not configured');
+                document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#dc3545;">Supabase not configured</p>';
+                return;
+            }
+        }
+        
+        const { data, error } = await supabase
+            .from('wallet-app')
+            .select('*')
+            .order('date', { ascending: false });
+        
+        if (error) {
+            console.error('Supabase error:', error);
+            showStatus('Failed to load data: ' + error.message);
+            document.getElementById('all-data-list').innerHTML = `<p style="text-align:center; color:#dc3545;">Error: ${error.message}</p>`;
+            return;
+        }
+        
+        const allData = data || [];
+        document.getElementById('data-count').innerText = `Total records: ${allData.length}`;
+        
+        if (allData.length === 0) {
+            document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#999;">No data found in wallet-app table</p>';
+            showStatus('No data found');
+            return;
+        }
+        
+        // Create table HTML
+        const tableHtml = createDataTable(allData);
+        document.getElementById('all-data-list').innerHTML = tableHtml;
+        showStatus(`Loaded ${allData.length} records`);
+        
+    } catch (error) {
+        console.error('Error loading all data:', error);
+        showStatus('Error loading data: ' + error.message);
+        document.getElementById('all-data-list').innerHTML = `<p style="text-align:center; color:#dc3545;">Error: ${error.message}</p>`;
+    }
+}
+
+function createDataTable(data) {
+    const headers = ['ID', 'Date', 'Type', 'Description', 'Category', 'Amount', 'User', 'Created At', 'Actions'];
+    
+    let html = `
+        <div style="overflow-x: auto; max-height: 60vh; overflow-y: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        ${headers.map(header => `<th>${header}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    data.forEach((row, index) => {
+        const typeClass = row.type === 'asset' ? 'asset' : (row.type === 'income' ? 'inc' : 'exp');
+        const sign = (row.type === 'asset' || row.type === 'income') ? '+' : '-';
+        const formattedAmount = formatAmount(parseFloat(row.amount || 0));
+        
+        html += `
+                    <tr class="data-row" onclick="highlightRow(this)">
+                        <td>${row.id || 'N/A'}</td>
+                        <td>${row.date ? formatDate(row.date) : 'No Date'}</td>
+                        <td><span style="font-weight: bold; color: ${getTypeColor(row.type)}">${row.type || 'N/A'}</span></td>
+                        <td>${row.desc || '—'}</td>
+                        <td><span style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${row.category || 'Uncategorized'}</span></td>
+                        <td class="${typeClass}">${sign}${formattedAmount} AED</td>
+                        <td><strong>${row.user || 'Unknown'}</strong></td>
+                        <td>${row.createdAt ? new Date(row.createdAt).toLocaleString() : 'N/A'}</td>
+                        <td class="data-actions">
+                            <button class="btn-edit" onclick="event.stopPropagation(); editRow('${row.id}')" title="Edit">Edit</button>
+                            <button class="btn-delete" onclick="event.stopPropagation(); deleteRow('${row.id}')" title="Delete">Delete</button>
+                        </td>
+                    </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    return html;
+}
+
+function getTypeColor(type) {
+    switch(type) {
+        case 'asset': return '#d4a017';
+        case 'income': return '#28a745';
+        case 'expense': return '#dc3545';
+        default: return '#666';
+    }
+}
+
+function highlightRow(row) {
+    // Remove previous highlights
+    document.querySelectorAll('.data-row').forEach(r => r.style.backgroundColor = '');
+    // Highlight selected row
+    row.style.backgroundColor = '#e9ecef';
+}
+
+function editRow(id) {
+    alert(`Edit functionality for record ${id} would be implemented here.\n\nIn a full implementation, this would open an edit form.`);
+}
+
+async function deleteRow(id) {
+    if (!confirm('Are you sure you want to delete this record?')) return;
+    
+    try {
+        if (!supabase) {
+            const initialized = initializeSupabase();
+            if (!initialized) {
+                alert('Supabase not configured');
+                return;
+            }
+        }
+        
+        const { error } = await supabase
+            .from('wallet-app')
+            .delete()
+            .eq('id', id);
+        
+        if (error) {
+            console.error('Delete error:', error);
+            alert('Failed to delete: ' + error.message);
+        } else {
+            alert('Record deleted successfully');
+            loadAllData(); // Refresh the data
+        }
+    } catch (error) {
+        console.error('Error deleting record:', error);
+        alert('Error deleting record: ' + error.message);
+    }
+}
+
+function exportData() {
+    if (!getPerm(getCurrentUser(), 'read')) { 
+        alert('No permission to export data');
+        return; 
+    }
+    
+    // Get all data
+    loadAllData().then(() => {
+        // Wait a moment for data to load, then export
+        setTimeout(() => {
+            const table = document.querySelector('.data-table');
+            if (!table) {
+                alert('No data to export');
+                return;
+            }
+            
+            // Convert table to CSV
+            let csv = [];
+            const rows = table.querySelectorAll('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                let row = [], cols = rows[i].querySelectorAll('td, th');
+                
+                for (let j = 0; j < cols.length - 1; j++) { // -1 to exclude Actions column
+                    const cellText = cols[j].innerText.replace(/,/g, ''); // Remove commas to avoid CSV issues
+                    row.push(`"${cellText}"`);
+                }
+                
+                csv.push(row.join(','));
+            }
+            
+            // Create download link
+            const csvContent = csv.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `wallet-app-data-${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('Data exported successfully');
+        }, 500);
+    });
+}
+
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
+    // Add event listener for login form
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            doLogin();
+        });
+    }
+    
     if (getCurrentUser()) {
         showApp();
     } else {
