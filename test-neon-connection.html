@@ -81,19 +81,44 @@
                 status.className = 'status info';
                 status.textContent = 'Loading PostgreSQL client...';
                 
-                // Load the PostgreSQL client
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/postgres@3.4.1/+esm';
-                script.onload = () => {
+                // Check if already loaded
+                if (typeof window !== 'undefined' && window.postgres) {
                     status.className = 'status success';
-                    status.textContent = 'PostgreSQL client loaded successfully!';
-                    logToDiv('PostgreSQL client loaded from CDN');
+                    status.textContent = 'PostgreSQL client already loaded!';
+                    logToDiv('PostgreSQL client already available');
+                    return;
+                }
+                
+                // Load the PostgreSQL client using dynamic import for ESM
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.textContent = `
+                    import postgres from 'https://cdn.jsdelivr.net/npm/postgres@3.4.1/+esm';
+                    window.postgres = postgres;
+                    window.postgresLoaded = true;
+                `;
+                
+                script.onload = () => {
+                    // Wait a moment for the module to be available
+                    setTimeout(() => {
+                        if (window.postgres) {
+                            status.className = 'status success';
+                            status.textContent = 'PostgreSQL client loaded successfully!';
+                            logToDiv('PostgreSQL client loaded from CDN');
+                        } else {
+                            status.className = 'status error';
+                            status.textContent = 'Failed to load PostgreSQL client';
+                            logToDiv('PostgreSQL client failed to load', true);
+                        }
+                    }, 100);
                 };
+                
                 script.onerror = (error) => {
                     status.className = 'status error';
                     status.textContent = 'Failed to load PostgreSQL client: ' + error.message;
                     logToDiv('Failed to load PostgreSQL client: ' + error.message, true);
                 };
+                
                 document.head.appendChild(script);
                 
             } catch (error) {

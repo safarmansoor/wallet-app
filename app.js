@@ -11,21 +11,38 @@ let isNeonConnected = false;
 // Import PostgreSQL client (using a CDN version that works in browsers)
 async function loadPostgresClient() {
     return new Promise((resolve, reject) => {
+        // Check if already loaded
         if (typeof window !== 'undefined' && window.postgres) {
             resolve(window.postgres);
             return;
         }
         
+        // Load the PostgreSQL client using dynamic import for ESM
         const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/postgres@3.4.1/+esm';
+        script.type = 'module';
+        script.textContent = `
+            import postgres from 'https://cdn.jsdelivr.net/npm/postgres@3.4.1/+esm';
+            window.postgres = postgres;
+            window.postgresLoaded = true;
+        `;
+        
         script.onload = () => {
-            console.log('PostgreSQL client loaded successfully');
-            resolve(window.postgres);
+            // Wait a moment for the module to be available
+            setTimeout(() => {
+                if (window.postgres) {
+                    console.log('PostgreSQL client loaded successfully');
+                    resolve(window.postgres);
+                } else {
+                    reject(new Error('PostgreSQL client failed to load'));
+                }
+            }, 100);
         };
+        
         script.onerror = (error) => {
             console.error('Failed to load PostgreSQL client:', error);
             reject(error);
         };
+        
         document.head.appendChild(script);
     });
 }
