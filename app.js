@@ -18,6 +18,12 @@ function initializeNeon() {
     
     if (url && key) {
         try {
+            // Validate URL format
+            const urlObj = new URL(url);
+            if (!urlObj.protocol.startsWith('http')) {
+                throw new Error('Invalid URL protocol. Must be HTTP or HTTPS.');
+            }
+            
             neon = createClient(url, key);
             console.log('Neon database initialized successfully');
             return true;
