@@ -16,7 +16,7 @@ function initializeNeon() {
     
     console.log('Neon initialization attempt:', { url: url ? '***' : 'empty', key: key ? '***' : 'empty' });
     
-    if (url && key && (url.startsWith('http') || url.startsWith('postgresql://'))) {
+    if (url && key) {
         try {
             neon = createClient(url, key);
             console.log('Neon database initialized successfully');
