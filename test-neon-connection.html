@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Database Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        input { padding: 8px; margin: 5px; width: 300px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Neon Database Connection Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Load PostgreSQL Client</h3>
+        <button onclick="loadPostgresClient()">Load PostgreSQL Client</button>
+        <div id="client-status" class="status info">Status: Not loaded</div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Test Database Connection</h3>
+        <input type="text" id="neon-url" placeholder="Enter Neon Database URL" style="width: 100%">
+        <button onclick="testConnection()">Test Connection</button>
+        <div id="connection-status" class="status info">Status: Not tested</div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Database Operations</h3>
+        <button onclick="testQuery()">Test Query</button>
+        <button onclick="testInsert()">Test Insert</button>
+        <button onclick="testSelect()">Test Select</button>
+        <div id="operation-status" class="status info">Status: Not tested</div>
+        <div id="operation-result" style="margin-top: 10px;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Console Logs</h3>
+        <div id="console-output" style="height: 200px; overflow-y: auto; background: #000; color: #0f0; padding: 10px; font-family: monospace;"></div>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <script>
+        let postgresClient = null;
+        let sql = null;
+
+        // Override console.log to capture output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const consoleOutput = document.getElementById('console-output');
+
+        function logToDiv(message, isError = false) {
+            const div = document.createElement('div');
+            div.style.color = isError ? '#ff6b6b' : '#0f0';
+            div.style.margin = '2px 0';
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logToDiv(args.join(' '));
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logToDiv(args.join(' '), true);
+        };
+
+        async function loadPostgresClient() {
+            const status = document.getElementById('client-status');
+            try {
+                status.className = 'status info';
+                status.textContent = 'Loading PostgreSQL client...';
+                
+                // Load the PostgreSQL client
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/postgres@3.4.1/+esm';
+                script.onload = () => {
+                    status.className = 'status success';
+                    status.textContent = 'PostgreSQL client loaded successfully!';
+                    logToDiv('PostgreSQL client loaded from CDN');
+                };
+                script.onerror = (error) => {
+                    status.className = 'status error';
+                    status.textContent = 'Failed to load PostgreSQL client: ' + error.message;
+                    logToDiv('Failed to load PostgreSQL client: ' + error.message, true);
+                };
+                document.head.appendChild(script);
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = 'Error: ' + error.message;
+                logToDiv('Error loading PostgreSQL client: ' + error.message, true);
+            }
+        }
+
+        async function testConnection() {
+            const status = document.getElementById('connection-status');
+            const url = document.getElementById('neon-url').value.trim();
+            
+            if (!url) {
+                status.className = 'status error';
+                status.textContent = 'Please enter a Neon database URL';
+                return;
+            }
+
+            try {
+                status.className = 'status info';
+                status.textContent = 'Testing connection...';
+                logToDiv('Attempting to connect to Neon database...');
+
+                // Check if URL is valid
+                if (!url.startsWith('postgresql://') && !url.startsWith('postgres://')) {
+                    throw new Error('Invalid PostgreSQL URL format');
+                }
+
+                // Load PostgreSQL client if not already loaded
+                if (typeof window.postgres === 'undefined') {
+                    await loadPostgresClient();
+                    // Wait a moment for the client to load
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+
+                // Create connection
+                sql = window.postgres(url, {
+                    ssl: {
+                        require: true,
+                        rejectUnauthorized: false
+                    },
+                    connection: {
+                        application_name: 'test-connection'
+                    }
+                });
+
+                // Test the connection
+                const result = await sql`SELECT 1 as test, NOW() as timestamp`;
+                
+                status.className = 'status success';
+                status.textContent = 'Connection successful! Database is accessible.';
+                logToDiv('Connection test successful: ' + JSON.stringify(result[0]));
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = 'Connection failed: ' + error.message;
+                logToDiv('Connection failed: ' + error.message, true);
+            }
+        }
+
+        async function testQuery() {
+            const status = document.getElementById('operation-status');
+            const resultDiv = document.getElementById('operation-result');
+            
+            if (!sql) {
+                status.className = 'status error';
+                status.textContent = 'Not connected to database. Please test connection first.';
+                return;
+            }
+
+            try {
+                status.className = 'status info';
+                status.textContent = 'Testing query...';
+                logToDiv('Executing test query...');
+
+                const result = await sql`SELECT id, "createdAt", date, type, "desc", category, amount, "user" FROM "wallet-app" LIMIT 5`;
+                
+                status.className = 'status success';
+                status.textContent = 'Query successful!';
+                resultDiv.innerHTML = '<h4>Query Result:</h4><pre>' + JSON.stringify(result, null, 2) + '</pre>';
+                logToDiv('Query executed successfully, found ' + result.length + ' records');
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = 'Query failed: ' + error.message;
+                resultDiv.innerHTML = '<h4>Error:</h4><pre>' + error.message + '</pre>';
+                logToDiv('Query failed: ' + error.message, true);
+            }
+        }
+
+        async function testInsert() {
+            const status = document.getElementById('operation-status');
+            const resultDiv = document.getElementById('operation-result');
+            
+            if (!sql) {
+                status.className = 'status error';
+                status.textContent = 'Not connected to database. Please test connection first.';
+                return;
+            }
+
+            try {
+                status.className = 'status info';
+                status.textContent = 'Testing insert...';
+                logToDiv('Executing test insert...');
+
+                const testId = Date.now();
+                const insertResult = await sql`
+                    INSERT INTO "wallet-app" (id, "createdAt", date, type, "desc", category, amount, "user")
+                    VALUES (${testId}, NOW(), CURRENT_DATE, 'income', 'Test transaction', 'Test', 100, 'testuser')
+                    ON CONFLICT (id) DO UPDATE SET
+                        "createdAt" = EXCLUDED."createdAt",
+                        date = EXCLUDED.date,
+                        type = EXCLUDED.type,
+                        "desc" = EXCLUDED."desc",
+                        category = EXCLUDED.category,
+                        amount = EXCLUDED.amount,
+                        "user" = EXCLUDED."user"
+                    RETURNING *
+                `;
+                
+                status.className = 'status success';
+                status.textContent = 'Insert successful!';
+                resultDiv.innerHTML = '<h4>Insert Result:</h4><pre>' + JSON.stringify(insertResult, null, 2) + '</pre>';
+                logToDiv('Insert executed successfully, ID: ' + testId);
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = 'Insert failed: ' + error.message;
+                resultDiv.innerHTML = '<h4>Error:</h4><pre>' + error.message + '</pre>';
+                logToDiv('Insert failed: ' + error.message, true);
+            }
+        }
+
+        async function testSelect() {
+            const status = document.getElementById('operation-status');
+            const resultDiv = document.getElementById('operation-result');
+            
+            if (!sql) {
+                status.className = 'status error';
+                status.textContent = 'Not connected to database. Please test connection first.';
+                return;
+            }
+
+            try {
+                status.className = 'status info';
+                status.textContent = 'Testing select...';
+                logToDiv('Executing test select...');
+
+                const result = await sql`
+                    SELECT COUNT(*) as total_records, 
+                           SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income,
+                           SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as total_expense
+                    FROM "wallet-app"
+                `;
+                
+                status.className = 'status success';
+                status.textContent = 'Select successful!';
+                resultDiv.innerHTML = '<h4>Select Result:</h4><pre>' + JSON.stringify(result, null, 2) + '</pre>';
+                logToDiv('Select executed successfully');
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = 'Select failed: ' + error.message;
+                resultDiv.innerHTML = '<h4>Error:</h4><pre>' + error.message + '</pre>';
+                logToDiv('Select failed: ' + error.message, true);
+            }
+        }
+
+        function clearConsole() {
+            consoleOutput.innerHTML = '';
+        }
+
+        // Auto-load PostgreSQL client on page load
+        window.onload = function() {
+            loadPostgresClient();
+        };
+    </script>
+</body>
+</html>

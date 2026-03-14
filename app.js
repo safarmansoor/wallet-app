@@ -10,17 +10,27 @@ let isNeonConnected = false;
 
 // Import PostgreSQL client (using a CDN version that works in browsers)
 async function loadPostgresClient() {
-    if (typeof window !== 'undefined' && !window.Postgres) {
+    return new Promise((resolve, reject) => {
+        if (typeof window !== 'undefined' && window.postgres) {
+            resolve(window.postgres);
+            return;
+        }
+        
         const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/pg@8.11.3/browser/index.js';
+        script.src = 'https://cdn.jsdelivr.net/npm/postgres@3.4.1/+esm';
         script.onload = () => {
             console.log('PostgreSQL client loaded successfully');
+            resolve(window.postgres);
+        };
+        script.onerror = (error) => {
+            console.error('Failed to load PostgreSQL client:', error);
+            reject(error);
         };
         document.head.appendChild(script);
-    }
+    });
 }
 
-// Initialize Neon database connection
+// Initialize Neon database connection with direct PostgreSQL client
 async function initializeNeon() {
     const url = getNeonUrl();
     const key = getNeonKey();
@@ -37,177 +47,75 @@ async function initializeNeon() {
     }
     
     try {
-        // For browser environment, we'll use a different approach
-        // Since direct PostgreSQL connections from browser are not secure,
-        // we'll create a simple API wrapper that can work with Neon
-        
         // Check if URL is valid PostgreSQL connection string
         if (!url.startsWith('postgresql://') && !url.startsWith('postgres://')) {
             console.error('Invalid PostgreSQL URL format');
             return false;
         }
         
-        // Parse the connection string
-        const urlObj = new URL(url);
-        const host = urlObj.hostname;
-        const port = urlObj.port || '5432';
-        const database = urlObj.pathname.slice(1);
-        const username = urlObj.username;
-        const password = urlObj.password;
+        // Load PostgreSQL client
+        const postgres = await loadPostgresClient();
         
-        if (!host || !database || !username || !password) {
-            console.error('Invalid connection string - missing required parameters');
+        // Create direct PostgreSQL connection
+        const sql = postgres(url, {
+            ssl: {
+                require: true,
+                rejectUnauthorized: false // For browser compatibility
+            },
+            connection: {
+                application_name: 'wallet-app'
+            }
+        });
+        
+        // Test the connection
+        try {
+            const result = await sql`SELECT 1 as test`;
+            console.log('Neon database connection test successful');
+        } catch (testError) {
+            console.error('Connection test failed:', testError);
+            await sql.end();
             return false;
         }
         
-        // Create a simple database API wrapper
+        // Create database API wrapper with direct PostgreSQL operations
         const neonDB = {
-            // Test connection
-            testConnection: async () => {
-                try {
-                    const response = await fetch('/api/test-neon-connection', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            url: url,
-                            key: key
-                        })
-                    });
-                    return response.ok;
-                } catch (error) {
-                    console.error('Connection test failed:', error);
-                    return false;
-                }
-            },
-            
             // Query wrapper for SELECT operations
-            query: async (sql, params = []) => {
+            query: async (sqlQuery, params = []) => {
                 try {
-                    const response = await fetch('/api/neon-query', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            url: url,
-                            key: key,
-                            sql: sql,
-                            params: params
-                        })
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    
-                    const result = await response.json();
-                    return result;
+                    // Use the sql template literal for proper parameterization
+                    const result = await sql.unsafe(sqlQuery, params);
+                    return { rows: result, rowCount: result.length };
                 } catch (error) {
                     console.error('Database query error:', error);
                     throw error;
                 }
             },
             
-            // Insert/Update operations
-            insert: async (table, data) => {
+            // Execute raw SQL with proper error handling
+            execute: async (sqlQuery, params = []) => {
                 try {
-                    const response = await fetch('/api/neon-insert', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            url: url,
-                            key: key,
-                            table: table,
-                            data: data
-                        })
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    
-                    const result = await response.json();
-                    return result;
+                    const result = await sql.unsafe(sqlQuery, params);
+                    return { rows: result, rowCount: result.length };
                 } catch (error) {
-                    console.error('Database insert error:', error);
+                    console.error('Database execute error:', error);
                     throw error;
                 }
             },
             
-            // Update operations
-            update: async (table, data, where) => {
+            // Close connection
+            close: async () => {
                 try {
-                    const response = await fetch('/api/neon-update', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            url: url,
-                            key: key,
-                            table: table,
-                            data: data,
-                            where: where
-                        })
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    
-                    const result = await response.json();
-                    return result;
+                    await sql.end();
                 } catch (error) {
-                    console.error('Database update error:', error);
-                    throw error;
-                }
-            },
-            
-            // Delete operations
-            delete: async (table, where) => {
-                try {
-                    const response = await fetch('/api/neon-delete', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            url: url,
-                            key: key,
-                            table: table,
-                            where: where
-                        })
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    
-                    const result = await response.json();
-                    return result;
-                } catch (error) {
-                    console.error('Database delete error:', error);
-                    throw error;
+                    console.error('Error closing database connection:', error);
                 }
             }
         };
         
-        // Test the connection
-        const isConnected = await neonDB.testConnection();
-        
-        if (isConnected) {
-            pgClient = neonDB;
-            isNeonConnected = true;
-            console.log('Neon database connected successfully');
-            return true;
-        } else {
-            console.error('Failed to connect to Neon database');
-            return false;
-        }
+        pgClient = neonDB;
+        isNeonConnected = true;
+        console.log('Neon database connected successfully');
+        return true;
         
     } catch (error) {
         console.error('Neon database initialization error:', error);
