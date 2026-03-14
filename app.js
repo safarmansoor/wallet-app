@@ -21,33 +21,113 @@ function initializeNeon() {
             
             // Check if it's a PostgreSQL URL
             if (url.startsWith('postgresql://') || url.startsWith('postgres://')) {
-                // For PostgreSQL URLs, we need to use a different approach
-                // Since we're not using Supabase anymore, we'll need to implement
-                // direct PostgreSQL connection or use a different client library
-                
-                // For now, we'll simulate the connection with a mock client
-                // In a real implementation, you would use a PostgreSQL client library
+                // For a real implementation, you would use a PostgreSQL client library
                 // like pg (node-postgres) or a similar library
+                
+                // Since we're in a browser environment, we need to use a different approach
+                // We'll create a client that makes HTTP requests to a backend API
+                // or use a library that can connect to PostgreSQL from the browser
+                
+                // For now, we'll create a client that simulates the database operations
+                // but in a real implementation, you would replace this with actual
+                // database connection code
                 
                 neon = {
                     from: (table) => ({
                         select: (fields) => ({
                             order: (field, options) => ({
-                                then: (callback) => callback({ data: [], error: null })
+                                then: async (callback) => {
+                                    try {
+                                        // In a real implementation, this would make an HTTP request
+                                        // to a backend API that connects to your Neon database
+                                        // For now, we'll return empty data
+                                        const response = await fetch('/api/database', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify({
+                                                url: url,
+                                                key: key,
+                                                operation: 'select',
+                                                table: table,
+                                                fields: fields,
+                                                order: field,
+                                                orderOptions: options
+                                            })
+                                        });
+                                        
+                                        const result = await response.json();
+                                        callback(result);
+                                    } catch (error) {
+                                        console.error('Database query error:', error);
+                                        callback({ data: [], error: error.message });
+                                    }
+                                }
                             })
                         }),
                         upsert: (data, options) => ({
-                            then: (callback) => callback({ data: [], error: null })
+                            then: async (callback) => {
+                                try {
+                                    // In a real implementation, this would make an HTTP request
+                                    // to a backend API that connects to your Neon database
+                                    const response = await fetch('/api/database', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            url: url,
+                                            key: key,
+                                            operation: 'upsert',
+                                            table: table,
+                                            data: data,
+                                            options: options
+                                        })
+                                    });
+                                    
+                                    const result = await response.json();
+                                    callback(result);
+                                } catch (error) {
+                                    console.error('Database upsert error:', error);
+                                    callback({ data: [], error: error.message });
+                                }
+                            }
                         }),
                         delete: () => ({
                             eq: (field, value) => ({
-                                then: (callback) => callback({ data: [], error: null })
+                                then: async (callback) => {
+                                    try {
+                                        // In a real implementation, this would make an HTTP request
+                                        // to a backend API that connects to your Neon database
+                                        const response = await fetch('/api/database', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify({
+                                                url: url,
+                                                key: key,
+                                                operation: 'delete',
+                                                table: table,
+                                                field: field,
+                                                value: value
+                                            })
+                                        });
+                                        
+                                        const result = await response.json();
+                                        callback(result);
+                                    } catch (error) {
+                                        console.error('Database delete error:', error);
+                                        callback({ data: [], error: error.message });
+                                    }
+                                }
                             })
                         })
                     })
                 };
                 
-                console.log('Neon database initialized successfully (mock client)');
+                console.log('Neon database initialized successfully');
                 return true;
             } else {
                 console.error('Neon database initialization error: Invalid URL format');
