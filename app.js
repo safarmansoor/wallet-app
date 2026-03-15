@@ -484,6 +484,145 @@ function removeTransaction(idx) {
 }
 
 
+async function loadFromNeon() {
+    try {
+        // Initialize Neon if not already done
+        if (!pgClient || !isNeonConnected) {
+            const initialized = await initializeNeon();
+            if (!initialized) {
+                showStatus('Neon database not configured');
+                // Fallback to localStorage data
+                transactions = fallbackDB.load();
+                updateUI();
+                return;
+            }
+        }
+        
+        showStatus('Loading from Neon database...');
+        
+        // Query all transactions from Neon database
+        const sql = `
+            SELECT id, "createdAt", date, type, "desc", category, amount, "user"
+            FROM "wallet-app"
+            ORDER BY date DESC, "createdAt" DESC
+        `;
+        
+        const result = await pgClient.query(sql);
+        
+        if (result && result.rows) {
+            transactions = result.rows;
+            // Ensure all transactions have a user field
+            transactions.forEach(t => { 
+                if (!t.user) t.user = 'renu'; 
+            });
+            showStatus(`Loaded ${transactions.length} records from Neon database`);
+        } else {
+            transactions = [];
+            showStatus('No data found in Neon database');
+        }
+        
+        updateUI();
+    } catch (error) {
+        console.error('Neon database error:', error);
+        showStatus('Neon database connection failed: ' + error.message);
+        // Fallback to localStorage data
+        transactions = fallbackDB.load();
+        updateUI();
+    }
+}
+
+async function saveToNeon() {
+    try {
+        // Initialize Neon if not already done
+        if (!pgClient || !isNeonConnected) {
+            const initialized = await initializeNeon();
+            if (!initialized) {
+                showStatus('Neon database not configured');
+                return;
+            }
+        }
+        
+        showStatus('Saving to Neon database...');
+        const latestTransaction = transactions[transactions.length - 1];
+        
+        if (!latestTransaction) {
+            showStatus('No transaction to save');
+            return;
+        }
+        
+        // Insert or update transaction in Neon database
+        const sql = `
+            INSERT INTO "wallet-app" (id, "createdAt", date, type, "desc", category, amount, "user")
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            ON CONFLICT (id) DO UPDATE SET
+                "createdAt" = EXCLUDED."createdAt",
+                date = EXCLUDED.date,
+                type = EXCLUDED.type,
+                "desc" = EXCLUDED."desc",
+                category = EXCLUDED.category,
+                amount = EXCLUDED.amount,
+                "user" = EXCLUDED."user"
+        `;
+        
+        const params = [
+            latestTransaction.id,
+            latestTransaction.createdAt,
+            latestTransaction.date,
+            latestTransaction.type,
+            latestTransaction.desc || '',
+            latestTransaction.category || '',
+            parseFloat(latestTransaction.amount),
+            latestTransaction.user || 'renu'
+        ];
+        
+        await pgClient.query(sql, params);
+        
+        showStatus('Saved to Neon database');
+    } catch (error) {
+        console.error('Neon database save error:', error);
+        showStatus('Neon database save failed: ' + error.message);
+        // Fallback to localStorage
+        const success = fallbackDB.add(latestTransaction);
+        if (success) {
+            showStatus('Saved to fallback storage');
+        } else {
+            showStatus('Failed to save data');
+        }
+    }
+}
+
+async function deleteFromNeon(transactionId) {
+    try {
+        // Initialize Neon if not already done
+        if (!pgClient || !isNeonConnected) {
+            const initialized = await initializeNeon();
+            if (!initialized) {
+                showStatus('Neon database not configured');
+                return;
+            }
+        }
+        
+        showStatus('Deleting from Neon database...');
+        
+        // Delete transaction from Neon database
+        const sql = 'DELETE FROM "wallet-app" WHERE id = $1';
+        const params = [transactionId];
+        
+        await pgClient.query(sql, params);
+        
+        showStatus('Deleted from Neon database');
+    } catch (error) {
+        console.error('Neon database delete error:', error);
+        showStatus('Neon database delete failed: ' + error.message);
+        // Fallback to localStorage
+        const success = fallbackDB.delete(transactionId);
+        if (success) {
+            showStatus('Deleted from fallback storage');
+        } else {
+            showStatus('Failed to delete data');
+        }
+    }
+}
 
 function addTransaction() {
     if (!getPerm(getCurrentUser(), 'write')) return;
