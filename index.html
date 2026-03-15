@@ -39,7 +39,7 @@
                 <span class="nav-icon">📈</span> Report
             </button>
             <button id="nav-users" class="nav-btn" onclick="showPage('users')">
-                <span class="nav-icon">👥</span> User
+                <span class="nav-icon">👨</span> User
             </button>
             <button id="nav-logout" class="nav-btn" onclick="logout()">
                 <span class="nav-icon">🚪</span> Logout
@@ -61,9 +61,9 @@
             <form id="tx-form" onsubmit="addTransaction(); return false;">
                 <input type="date" id="t-date" required>
                 <select id="type">
-                    <option value="asset">Asset (-)</option>
-                    <option value="income">Income (+)</option>
                     <option value="expense">Expense (-)</option>
+                    <option value="income">Income (+)</option>
+                    <option value="asset">Asset (-)</option>
                 </select>
                 <input type="text" id="category" placeholder="Category (e.g. Food)" list="cat-suggestions">
                 <datalist id="cat-suggestions">
