@@ -175,7 +175,7 @@ window.quickLogin = function(username) {
     }
 }
 
-function doLogin() {
+async function doLogin() {
     const u = (document.getElementById('login-username').value || '').trim().toLowerCase();
     const p = document.getElementById('login-password').value;
     const err = document.getElementById('login-error');
@@ -203,8 +203,7 @@ function doLogin() {
     err.textContent = '';
     setCurrentUser(u);
     setTrackUser(u);
-    showApp();
-    loadFromGitHub(); // Sync data on login
+    await showApp(); // showApp now handles data loading
 }
 
 window.logout = function() {
@@ -310,7 +309,7 @@ window.clearUserForm = function() {
     document.getElementById('user-password').value = '';
 }
 
-function showApp() {
+async function showApp() {
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app').classList.add('visible');
     const u = getCurrentUser();
@@ -331,7 +330,8 @@ function showApp() {
         setTrackUser(u);
     }
     
-    // Initialize UI with current data
+    // Load data and then initialize UI
+    await loadFromGitHub();
     updateUI();
 }
 window.switchTrackUser = function() {
@@ -463,6 +463,7 @@ async function loadFromGitHub() {
             if (!t.user) t.user = 'renu'; 
         });
         updateConnectionStatus('connected');
+        // Only update UI after data is successfully loaded
         updateUI();
     } catch (error) {
         console.error('Error loading data:', error);
