@@ -540,15 +540,59 @@ function removeTransaction(idx) {
 
 function addTransaction() {
     if (!getPerm(getCurrentUser(), 'write')) return;
-    const date = document.getElementById('t-date').value, type = document.getElementById('type').value;
-    const desc = document.getElementById('desc').value, category = document.getElementById('category').value, amount = document.getElementById('amount').value;
-    if(!amount || !date) return alert('Please fill date and amount');
-    transactions.push({ id: Date.now(), createdAt: new Date().toISOString(), date, type, desc: desc || '', category, amount, user: getTrackUser() });
+    
+    const date = document.getElementById('t-date').value;
+    const type = document.getElementById('type').value;
+    const desc = document.getElementById('desc').value;
+    const category = document.getElementById('category').value;
+    const amount = document.getElementById('amount').value;
+    
+    // Validate required fields
+    if(!amount || !date) {
+        alert('Please fill date and amount');
+        return;
+    }
+    
+    // Validate amount is a valid number
+    const amountNum = parseFloat(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+        alert('Please enter a valid positive amount');
+        return;
+    }
+    
+    // Create transaction object
+    const newTransaction = {
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        date: date,
+        type: type,
+        desc: desc || '',
+        category: category || 'Uncategorized',
+        amount: amount,
+        user: getTrackUser()
+    };
+    
+    // Add to local transactions array
+    transactions.push(newTransaction);
+    
+    // Update UI immediately
     updateUI();
-    githubData.add(transactions[transactions.length - 1]);
-    document.getElementById('desc').value = '';
-    document.getElementById('amount').value = '';
-    setToday();
+    
+    // Save to GitHub
+    githubData.add(newTransaction).then(success => {
+        if (success) {
+            // Clear form fields after successful save
+            document.getElementById('desc').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('category').value = '';
+            setToday();
+        } else {
+            alert('Transaction added locally but failed to save to GitHub. Please try again.');
+        }
+    }).catch(error => {
+        console.error('Error saving transaction:', error);
+        alert('Transaction added locally but failed to save to GitHub. Please try again.');
+    });
 }
 
 // All Data Page Functions

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Add Transaction Functionality</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .test-result { margin-top: 10px; padding: 10px; border-radius: 4px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        input { margin: 5px 0; padding: 5px; width: 100%; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <h1>Wallet App - Add Transaction Test</h1>
+    
+    <div class="test-section">
+        <h3>Test 1: Valid Transaction Addition</h3>
+        <p>Test adding a valid transaction with all required fields.</p>
+        <div>
+            <input type="date" id="test-date" value="2026-03-16">
+            <select id="test-type">
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+                <option value="asset">Asset</option>
+            </select>
+            <input type="text" id="test-category" value="Test Category" placeholder="Category">
+            <input type="number" id="test-amount" value="50.00" placeholder="Amount">
+            <input type="text" id="test-desc" value="Test transaction for validation" placeholder="Description">
+        </div>
+        <button onclick="testValidTransaction()">Test Valid Transaction</button>
+        <div id="test1-result" class="test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Invalid Amount Validation</h3>
+        <p>Test validation with invalid amount (negative or zero).</p>
+        <div>
+            <input type="number" id="test-invalid-amount" value="-10" placeholder="Invalid Amount (-10)">
+        </div>
+        <button onclick="testInvalidAmount()">Test Invalid Amount</button>
+        <div id="test2-result" class="test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Missing Required Fields</h3>
+        <p>Test validation with missing date or amount.</p>
+        <div>
+            <input type="text" id="test-missing-amount" value="" placeholder="Empty Amount">
+            <input type="date" id="test-missing-date" value="" placeholder="Empty Date">
+        </div>
+        <button onclick="testMissingFields()">Test Missing Fields</button>
+        <div id="test3-result" class="test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Current Transaction Count</h3>
+        <p>Shows the current number of transactions in the system.</p>
+        <button onclick="showTransactionCount()">Show Count</button>
+        <div id="count-result" class="test-result"></div>
+    </div>
+
+    <script>
+        // Mock the wallet app functions for testing
+        let transactions = [];
+        let currentUser = 'testuser';
+        
+        function getPerm(user, perm) {
+            return 1; // Mock: allow all permissions for testing
+        }
+        
+        function getCurrentUser() {
+            return currentUser;
+        }
+        
+        function getTrackUser() {
+            return currentUser;
+        }
+        
+        function updateUI() {
+            // Mock updateUI function
+            console.log('UI updated with', transactions.length, 'transactions');
+        }
+        
+        function setToday() {
+            // Mock setToday function
+        }
+        
+        // Mock githubData.add function
+        const githubData = {
+            add: async (transaction) => {
+                console.log('GitHub add called with:', transaction);
+                return true; // Mock successful save
+            }
+        };
+
+        // The fixed addTransaction function
+        function addTransaction() {
+            if (!getPerm(getCurrentUser(), 'write')) return;
+            
+            const date = document.getElementById('t-date').value;
+            const type = document.getElementById('type').value;
+            const desc = document.getElementById('desc').value;
+            const category = document.getElementById('category').value;
+            const amount = document.getElementById('amount').value;
+            
+            // Validate required fields
+            if(!amount || !date) {
+                alert('Please fill date and amount');
+                return;
+            }
+            
+            // Validate amount is a valid number
+            const amountNum = parseFloat(amount);
+            if (isNaN(amountNum) || amountNum <= 0) {
+                alert('Please enter a valid positive amount');
+                return;
+            }
+            
+            // Create transaction object
+            const newTransaction = {
+                id: Date.now(),
+                createdAt: new Date().toISOString(),
+                date: date,
+                type: type,
+                desc: desc || '',
+                category: category || 'Uncategorized',
+                amount: amount,
+                user: getTrackUser()
+            };
+            
+            // Add to local transactions array
+            transactions.push(newTransaction);
+            
+            // Update UI immediately
+            updateUI();
+            
+            // Save to GitHub
+            githubData.add(newTransaction).then(success => {
+                if (success) {
+                    // Clear form fields after successful save
+                    document.getElementById('desc').value = '';
+                    document.getElementById('amount').value = '';
+                    document.getElementById('category').value = '';
+                    setToday();
+                } else {
+                    alert('Transaction added locally but failed to save to GitHub. Please try again.');
+                }
+            }).catch(error => {
+                console.error('Error saving transaction:', error);
+                alert('Transaction added locally but failed to save to GitHub. Please try again.');
+            });
+        }
+
+        // Test functions
+        function testValidTransaction() {
+            const resultDiv = document.getElementById('test1-result');
+            
+            // Set test values
+            document.getElementById('t-date').value = document.getElementById('test-date').value;
+            document.getElementById('type').value = document.getElementById('test-type').value;
+            document.getElementById('category').value = document.getElementById('test-category').value;
+            document.getElementById('amount').value = document.getElementById('test-amount').value;
+            document.getElementById('desc').value = document.getElementById('test-desc').value;
+            
+            // Mock alert function to capture messages
+            const originalAlert = window.alert;
+            let alertMessage = '';
+            window.alert = function(message) {
+                alertMessage = message;
+            };
+            
+            // Call the function
+            addTransaction();
+            
+            // Restore alert
+            window.alert = originalAlert;
+            
+            if (alertMessage) {
+                resultDiv.innerHTML = `<strong>Validation Alert:</strong> ${alertMessage}`;
+                resultDiv.className = 'test-result error';
+            } else {
+                resultDiv.innerHTML = `<strong>Success:</strong> Transaction added successfully! Current count: ${transactions.length}`;
+                resultDiv.className = 'test-result success';
+            }
+        }
+        
+        function testInvalidAmount() {
+            const resultDiv = document.getElementById('test2-result');
+            
+            // Set invalid amount
+            document.getElementById('t-date').value = '2026-03-16';
+            document.getElementById('type').value = 'expense';
+            document.getElementById('category').value = 'Test';
+            document.getElementById('amount').value = document.getElementById('test-invalid-amount').value;
+            document.getElementById('desc').value = 'Test invalid amount';
+            
+            // Mock alert function
+            const originalAlert = window.alert;
+            let alertMessage = '';
+            window.alert = function(message) {
+                alertMessage = message;
+            };
+            
+            // Call the function
+            addTransaction();
+            
+            // Restore alert
+            window.alert = originalAlert;
+            
+            resultDiv.innerHTML = `<strong>Validation Result:</strong> ${alertMessage || 'No validation triggered'}`;
+            resultDiv.className = alertMessage ? 'test-result info' : 'test-result error';
+        }
+        
+        function testMissingFields() {
+            const resultDiv = document.getElementById('test3-result');
+            
+            // Set missing fields
+            document.getElementById('t-date').value = document.getElementById('test-missing-date').value;
+            document.getElementById('type').value = 'expense';
+            document.getElementById('category').value = 'Test';
+            document.getElementById('amount').value = document.getElementById('test-missing-amount').value;
+            document.getElementById('desc').value = 'Test missing fields';
+            
+            // Mock alert function
+            const originalAlert = window.alert;
+            let alertMessage = '';
+            window.alert = function(message) {
+                alertMessage = message;
+            };
+            
+            // Call the function
+            addTransaction();
+            
+            // Restore alert
+            window.alert = originalAlert;
+            
+            resultDiv.innerHTML = `<strong>Validation Result:</strong> ${alertMessage || 'No validation triggered'}`;
+            resultDiv.className = alertMessage ? 'test-result info' : 'test-result error';
+        }
+        
+        function showTransactionCount() {
+            const resultDiv = document.getElementById('count-result');
+            resultDiv.innerHTML = `<strong>Current Transaction Count:</strong> ${transactions.length}`;
+            resultDiv.className = 'test-result success';
+        }
+    </script>
+</body>
+</html>
