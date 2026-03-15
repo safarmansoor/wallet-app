@@ -53,7 +53,6 @@ button:disabled { background: #2A231D; color: #FFFFFF; cursor: not-allowed; }
 .modal-content { background: #FFFFFF; margin: 15% 20px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto; border: 1px solid #2A231D; }
 .settings-btn { position: fixed; bottom: 25px; right: 25px; background: #B89758; color: #2A231D; border-radius: 50%; width: 56px; height: 56px; display: flex; justify-content: center; align-items: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 900; transition: all 0.2s ease; }
 .settings-btn:hover { background: #2A231D; color: #FFFFFF; transform: scale(1.1); }
-#status-bar { text-align: center; font-size: 0.75rem; color: #2A231D; margin-bottom: 15px; min-height: 1rem; background: #2A231D; padding: 8px; border-radius: 8px; }
 .connection-status { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2); }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #8C4A3A; box-shadow: 0 0 6px rgba(140, 74, 58, 0.5); animation: pulse 2s infinite; }
 .status-dot.connected { background: #5C6B46; box-shadow: 0 0 6px rgba(92, 107, 70, 0.5); }

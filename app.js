@@ -364,8 +364,6 @@ window.saveSettings = function() {
 }
 
 
-function showStatus(msg) { document.getElementById('status-bar').innerText = msg; }
-
 // Connection status management
 function updateConnectionStatus(status, text) {
     const statusEl = document.getElementById('connection-status');
@@ -423,10 +421,9 @@ function checkConnection() {
 }
 
 async function loadFromGitHub() {
-    if (!getPerm(getCurrentUser(), 'read')) { showStatus('No read permission'); return; }
+    if (!getPerm(getCurrentUser(), 'read')) { return; }
     
     updateConnectionStatus('syncing');
-    showStatus('Loading from data.json...');
     
     try {
         transactions = await githubData.load();
@@ -434,12 +431,10 @@ async function loadFromGitHub() {
         transactions.forEach(t => { 
             if (!t.user) t.user = 'renu'; 
         });
-        showStatus(`Loaded ${transactions.length} records from data.json`);
         updateConnectionStatus('connected');
         updateUI();
     } catch (error) {
         console.error('Error loading data:', error);
-        showStatus('Failed to load data: ' + error.message);
         updateConnectionStatus('disconnected');
         transactions = [];
         updateUI();
@@ -447,20 +442,19 @@ async function loadFromGitHub() {
 }
 
 async function saveToGitHub() {
-    showStatus('Saving...');
     const addBtn = document.getElementById('add-btn');
     if (addBtn) { addBtn.disabled = true; addBtn.innerText = 'Saving...'; }
     
     try {
         const success = await githubData.save(transactions);
         if (success) {
-            showStatus('Saved to data.json');
+            // Save successful - connection status already updated by loadFromGitHub
         } else {
-            showStatus('Failed to save - check GitHub settings');
+            // Failed to save - connection status already updated by loadFromGitHub
         }
     } catch (error) {
         console.error('Error saving data:', error);
-        showStatus('Failed to save: ' + error.message);
+        // Error occurred - connection status already updated by loadFromGitHub
     }
     
     if (addBtn) { addBtn.disabled = false; addBtn.innerText = 'Add Transaction'; }
@@ -560,12 +554,10 @@ function addTransaction() {
 // All Data Page Functions
 async function loadAllData() {
     if (!getPerm(getCurrentUser(), 'read')) { 
-        showStatus('No read permission'); 
         document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#999;">No permission to view data</p>';
         return; 
     }
     
-    showStatus('Loading all data...');
     document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#666;">Loading...</p>';
     
     try {
@@ -575,18 +567,15 @@ async function loadAllData() {
         
         if (allData.length === 0) {
             document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#999;">No data found in data.json</p>';
-            showStatus('No data found');
             return;
         }
         
         // Create table HTML
         const tableHtml = createDataTable(allData);
         document.getElementById('all-data-list').innerHTML = tableHtml;
-        showStatus(`Loaded ${allData.length} records`);
         
     } catch (error) {
         console.error('Error loading all data:', error);
-        showStatus('Error loading data: ' + error.message);
         document.getElementById('all-data-list').innerHTML = `<p style="text-align:center; color:#dc3545;">Error: ${error.message}</p>`;
     }
 }
