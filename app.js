@@ -34,6 +34,19 @@ const githubData = {
             });
             
             if (!response.ok) {
+                // If GitHub authentication fails (401, 403), fall back to local data.json
+                if (response.status === 401 || response.status === 403) {
+                    console.warn('GitHub authentication failed, falling back to local data.json');
+                    try {
+                        const localResponse = await fetch('data.json');
+                        if (localResponse.ok) {
+                            const data = await localResponse.json();
+                            return data || [];
+                        }
+                    } catch (e) {
+                        console.warn('Local data.json also not available');
+                    }
+                }
                 throw new Error(`GitHub API Error: HTTP ${response.status}: ${response.statusText}`);
             }
             
@@ -44,6 +57,16 @@ const githubData = {
             
         } catch (error) {
             console.error('Error loading data from GitHub:', error);
+            // Try to load from local data.json as final fallback
+            try {
+                const response = await fetch('data.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    return data || [];
+                }
+            } catch (e) {
+                console.warn('Local data.json also not available');
+            }
             return [];
         }
     },
@@ -414,6 +437,9 @@ function updateConnectionStatus(status, text) {
         textEl.innerText = 'Disconnected';
     }
 }
+
+// Make loadFromGitHub globally accessible for HTML buttons
+window.loadFromGitHub = loadFromGitHub;
 
 function checkConnection() {
     // Check if GitHub credentials are configured
