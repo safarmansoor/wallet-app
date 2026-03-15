@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="GitWallet">
+    <title>Wallet Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>Wallet App</h2>
+            <p class="login-error" id="login-error"></p>
+            <div class="quick-login">
+                <h3>Quick Login</h3>
+                <div class="user-buttons">
+                    <button type="button" class="user-btn" onclick="quickLogin('safar')">Admin (safar)</button>
+                    <button type="button" class="user-btn" onclick="quickLogin('renu')">User (renu)</button>
+                </div>
+            </div>
+            <div class="divider">OR</div>
+            <form id="login-form">
+                <input type="text" id="login-username" placeholder="Username" autocomplete="username">
+                <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+    <div id="app">
+        <div id="status-bar">Connecting...</div>
+        <div id="main-content">
+        <header class="app-header">
+            <h1>Wallet</h1>
+            <select id="user-select" onchange="switchTrackUser()" title="Track for user"></select>
+            <nav class="app-nav">
+            <button id="nav-dashboard" class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
+            <button id="nav-reports" class="nav-btn" onclick="showPage('reports')">Reports</button>
+            <button id="nav-users" class="nav-btn" onclick="showPage('users')" style="display:none;">Users</button>
+            <button id="nav-all-data" class="nav-btn" onclick="showPage('all-data')" style="display:none;">All Data</button>
+            </nav>
+            
+        </header>
+        <div id="page-dashboard" class="page active">
+        <div class="dashboard">
+            <div class="card asset"><h3>Asset</h3><p id="total-asset">0.00 AED</p></div>
+            <div class="card inc"><h3>Income</h3><p id="total-inc">0.00 AED</p></div>
+            <div class="card exp"><h3>Expense</h3><p id="total-exp">0.00 AED</p></div>
+        </div>
+        <div class="dashboard">
+            <div class="card balance" id="balance-card"><h3>Cash Balance</h3><p id="total-balance">0.00 AED</p></div>
+        </div>
+        <div class="input-group" id="add-transaction-form">
+            <form id="tx-form" onsubmit="addTransaction(); return false;">
+                <input type="date" id="t-date" required>
+                <select id="type">
+                    <option value="asset">Asset (-)</option>
+                    <option value="income">Income (+)</option>
+                    <option value="expense">Expense (-)</option>
+                </select>
+                <input type="text" id="category" placeholder="Category (e.g. Food)" list="cat-suggestions">
+                <datalist id="cat-suggestions">
+                    <option value="Food"><option value="Transport"><option value="Salary"><option value="Utilities"><option value="Entertainment">
+                </datalist>
+                <input type="number" id="amount" placeholder="Amount" step="0.01" inputmode="decimal" required>
+                <input type="text" id="desc" placeholder="Description (optional)">
+                <button id="add-btn" type="submit">Add Transaction</button>
+            </form>
+        </div>
+        <div class="list-header">Recent Activity</div>
+        <div id="history-list"></div>
+        </div>
+        <div id="page-reports" class="page">
+        <div class="category-section">
+            <div class="list-header">By Category</div>
+            <div id="category-list"></div>
+        </div>
+        <div class="category-section">
+            <div class="list-header">By Month</div>
+            <div id="month-list"></div>
+        </div>
+        </div>
+        <div id="page-users" class="page">
+            <div class="list-header">User List</div>
+            <div id="user-list"></div>
+            <div class="input-group" style="margin-top: 20px;">
+                <h3 style="margin: 0 0 15px; font-size: 1rem;">Add/Edit User</h3>
+                <input type="text" id="user-username" placeholder="Username">
+                <input type="password" id="user-password" placeholder="Password">
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="saveUser()" style="flex: 1;">Save User</button>
+                    <button onclick="clearUserForm()" style="flex: 1; background: #6c757d;">Clear</button>
+                </div>
+            </div>
+            <div class="input-group" style="margin-top: 20px;">
+                <h3 style="margin: 0 0 15px; font-size: 1rem;">GitHub Setup</h3>
+                <input type="text" id="gh-username" placeholder="GitHub Username" onchange="saveGhSetting()">
+                <input type="text" id="gh-repo" placeholder="Repository Name" onchange="saveGhSetting()">
+                <input type="text" id="gh-filename" placeholder="Filename" value="data.json" onchange="saveGhSetting()">
+                <input type="password" id="gh-token" placeholder="Personal Access Token (PAT)" onchange="saveGhSetting()">
+                <button onclick="loadFromGitHub()" style="margin-top: 10px;">Sync Now</button>
+            </div>
+            <div class="input-group" style="margin-top: 20px;">
+                <h3 style="margin: 0 0 15px; font-size: 1rem;">Neon Database Setup</h3>
+                <input type="text" id="neon-url" placeholder="Neon Database URL">
+                <input type="password" id="neon-key" placeholder="Neon Database API Key">
+                <button onclick="saveSettings()" style="margin-top: 10px;">Save Neon Settings</button>
+            </div>
+            <div id="all-data-list"></div>
+        </div>
+        <div id="no-permission-msg" style="display:none; text-align:center; padding:40px; color:#999;">No view permission. Contact admin.</div>
+        <div class="settings-btn" onclick="toggleSettings()">⚙</div>
+        <div id="settings-modal">
+            <div class="modal-content">
+                <h2>Settings</h2>
+                <button id="permissions-btn" onclick="toggleSettings(); togglePermissions()" style="background:#6c757d; margin-bottom:10px; display:none;">User Permissions</button>
+                <button onclick="showPage('users')" style="margin-bottom:10px;">Users</button>
+                <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="margin: 0 0 10px; font-size: 1rem;">Data Migration</h3>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Migrate your existing data from data.json to your Neon database.</p>
+                    <button onclick="migrateDataToNeon()" style="background: #28a745; color: white; margin-bottom: 10px; width: 100%;">Migrate Data to Neon</button>
+                    <button onclick="backupDataToLocalStorage()" style="background: #17a2b8; color: white; width: 100%;">Backup Data to LocalStorage</button>
+                </div>
+                <button onclick="logout()" style="background:#dc3545; margin-top:10px;">Logout</button>
+                <button onclick="toggleSettings()" style="background:#eee; color:#333; margin-top:10px;">Close</button>
+            </div>
+        </div>
+        <div id="permissions-modal">
+            <div class="modal-content">
+                <h2>User Permissions</h2>
+                <p style="font-size:0.9rem; color:#666; margin-bottom: 15px;">Set read, write, view, delete for each user.</p>
+                <div id="permissions-grid"></div>
+                <button onclick="savePermissions()">Save Permissions</button>
+                <button onclick="togglePermissions()" style="background:#eee; color:#333; margin-top:10px;">Close</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="app.js"></script>
+        
+</body>
+</html>
+
