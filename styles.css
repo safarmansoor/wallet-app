@@ -503,7 +503,7 @@ button:disabled {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 0px;
     z-index: 2000;
 }
 
