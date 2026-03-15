@@ -1,356 +1,106 @@
 
 
-// Get Neon database credentials from localStorage or use defaults
-const getNeonUrl = () => localStorage.getItem('neon_url') || '';
-const getNeonKey = () => localStorage.getItem('neon_key') || '';
-
-// Initialize PostgreSQL client for Neon database
-let pgClient = null;
-let isNeonConnected = false;
-
-// Import PostgreSQL client (using a CDN version that works in browsers)
-async function loadPostgresClient() {
-    return new Promise((resolve, reject) => {
-        // Check if already loaded
-        if (typeof window !== 'undefined' && window.postgres) {
-            resolve(window.postgres);
-            return;
-        }
-        
-        // Load the PostgreSQL client using dynamic import for ESM
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.textContent = `
-            import postgres from 'https://cdn.jsdelivr.net/npm/postgres@3.4.1/+esm';
-            window.postgres = postgres;
-            window.postgresLoaded = true;
-        `;
-        
-        script.onload = () => {
-            // Wait a moment for the module to be available
-            setTimeout(() => {
-                if (window.postgres) {
-                    console.log('PostgreSQL client loaded successfully');
-                    resolve(window.postgres);
-                } else {
-                    reject(new Error('PostgreSQL client failed to load'));
-                }
-            }, 100);
-        };
-        
-        script.onerror = (error) => {
-            console.error('Failed to load PostgreSQL client:', error);
-            reject(error);
-        };
-        
-        document.head.appendChild(script);
-    });
-}
-
-// Initialize Neon database connection with direct PostgreSQL client
-async function initializeNeon() {
-    const url = getNeonUrl();
-    const key = getNeonKey();
-    
-    console.log('Neon initialization attempt:', { 
-        hasUrl: !!url, 
-        hasKey: !!key,
-        urlPreview: url ? url.substring(0, 30) + '...' : 'empty' 
-    });
-    
-    if (!url) {
-        console.warn('Neon database URL not configured');
-        return false;
-    }
-    
-    try {
-        // Check if URL is valid PostgreSQL connection string
-        if (!url.startsWith('postgresql://') && !url.startsWith('postgres://')) {
-            console.error('Invalid PostgreSQL URL format');
-            return false;
-        }
-        
-        // Load PostgreSQL client
-        const postgres = await loadPostgresClient();
-        
-        // Create direct PostgreSQL connection
-        const sql = postgres(url, {
-            ssl: {
-                require: true,
-                rejectUnauthorized: false // For browser compatibility
-            },
-            connection: {
-                application_name: 'wallet-app'
-            }
-        });
-        
-        // Test the connection
-        try {
-            const result = await sql`SELECT 1 as test`;
-            console.log('Neon database connection test successful');
-        } catch (testError) {
-            console.error('Connection test failed:', testError);
-            await sql.end();
-            return false;
-        }
-        
-        // Create database API wrapper with direct PostgreSQL operations
-        const neonDB = {
-            // Query wrapper for SELECT operations
-            query: async (sqlQuery, params = []) => {
-                try {
-                    // Use the sql template literal for proper parameterization
-                    const result = await sql.unsafe(sqlQuery, params);
-                    return { rows: result, rowCount: result.length };
-                } catch (error) {
-                    console.error('Database query error:', error);
-                    throw error;
-                }
-            },
-            
-            // Execute raw SQL with proper error handling
-            execute: async (sqlQuery, params = []) => {
-                try {
-                    const result = await sql.unsafe(sqlQuery, params);
-                    return { rows: result, rowCount: result.length };
-                } catch (error) {
-                    console.error('Database execute error:', error);
-                    throw error;
-                }
-            },
-            
-            // Close connection
-            close: async () => {
-                try {
-                    await sql.end();
-                } catch (error) {
-                    console.error('Error closing database connection:', error);
-                }
-            }
-        };
-        
-        pgClient = neonDB;
-        isNeonConnected = true;
-        console.log('Neon database connected successfully');
-        return true;
-        
-    } catch (error) {
-        console.error('Neon database initialization error:', error);
-        return false;
-    }
-}
-
-// Fallback database operations using localStorage for when Neon is not available
-const fallbackDB = {
-    // Load data from localStorage
-    load: () => {
-        try {
-            const data = localStorage.getItem('wallet_transactions');
-            return data ? JSON.parse(data) : [];
-        } catch (error) {
-            console.error('Error loading fallback data:', error);
-            return [];
-        }
-    },
-    
-    // Save data to localStorage
-    save: (data) => {
-        try {
-            localStorage.setItem('wallet_transactions', JSON.stringify(data));
-            return true;
-        } catch (error) {
-            console.error('Error saving fallback data:', error);
-            return false;
-        }
-    },
-    
-    // Add new transaction
-    add: (transaction) => {
-        const data = fallbackDB.load();
-        data.push(transaction);
-        return fallbackDB.save(data);
-    },
-    
-    // Update transaction
-    update: (id, updates) => {
-        const data = fallbackDB.load();
-        const index = data.findIndex(t => t.id === id);
-        if (index !== -1) {
-            data[index] = { ...data[index], ...updates };
-            return fallbackDB.save(data);
-        }
-        return false;
-    },
-    
-    // Delete transaction
-    delete: (id) => {
-        const data = fallbackDB.load();
-        const filtered = data.filter(t => t.id !== id);
-        return fallbackDB.save(filtered);
-    }
-};
-
-// Data migration functions
-const dataMigration = {
+// Data operations using GitHub data.json file
+const githubData = {
     // Load data from data.json file
-    loadFromDataJson: async () => {
+    load: async () => {
         try {
             const response = await fetch('data.json');
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             const data = await response.json();
-            return data;
+            return data || [];
         } catch (error) {
             console.error('Error loading data.json:', error);
             return [];
         }
     },
     
-    // Migrate data from data.json to Neon database
-    migrateToNeon: async () => {
+    // Save data to data.json using GitHub API
+    save: async (data) => {
         try {
-            // Check if Neon database is configured
-            const neonUrl = getSetting('neon_url');
-            const neonKey = getSetting('neon_key');
+            const githubToken = getSetting('gh_token');
+            const githubUsername = getSetting('gh_username');
+            const githubRepo = getSetting('gh_repo');
+            const filename = getSetting('gh_filename') || 'data.json';
             
-            if (!neonUrl || !neonKey) {
-                showStatus('Neon database not configured');
+            if (!githubToken || !githubUsername || !githubRepo) {
+                console.warn('GitHub credentials not configured for saving');
                 return false;
             }
             
-            // Initialize Neon if not already done
-            if (!pgClient || !isNeonConnected) {
-                const initialized = await initializeNeon();
-                if (!initialized) {
-                    showStatus('Failed to connect to Neon database');
-                    return false;
+            // Get current file info
+            const fileResponse = await fetch(`https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${filename}`, {
+                headers: {
+                    'Authorization': `token ${githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json'
                 }
+            });
+            
+            let sha = null;
+            if (fileResponse.ok) {
+                const fileInfo = await fileResponse.json();
+                sha = fileInfo.sha;
             }
             
-            showStatus('Loading data from data.json...');
+            // Prepare data
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
             
-            // Load data from data.json
-            const data = await dataMigration.loadFromDataJson();
+            // Update file
+            const updateResponse = await fetch(`https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${filename}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: 'Update wallet data via web app',
+                    content: content,
+                    sha: sha,
+                    branch: 'main'
+                })
+            });
             
-            if (!data || data.length === 0) {
-                showStatus('No data found in data.json');
+            if (updateResponse.ok) {
+                console.log('Data saved to GitHub successfully');
+                return true;
+            } else {
+                const error = await updateResponse.json();
+                console.error('GitHub save error:', error);
                 return false;
             }
-            
-            showStatus(`Found ${data.length} records in data.json, migrating to Neon database...`);
-            
-            // Insert each transaction into Neon database
-            let successCount = 0;
-            let errorCount = 0;
-            
-            for (const transaction of data) {
-                try {
-                    const sql = `
-                        INSERT INTO "wallet-app" (id, "createdAt", date, type, "desc", category, amount, "user")
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                        ON CONFLICT (id) DO UPDATE SET
-                            "createdAt" = EXCLUDED."createdAt",
-                            date = EXCLUDED.date,
-                            type = EXCLUDED.type,
-                            "desc" = EXCLUDED."desc",
-                            category = EXCLUDED.category,
-                            amount = EXCLUDED.amount,
-                            "user" = EXCLUDED."user"
-                    `;
-                    
-                    const params = [
-                        transaction.id,
-                        transaction.createdAt || new Date().toISOString(),
-                        transaction.date,
-                        transaction.type,
-                        transaction.desc || '',
-                        transaction.category || '',
-                        parseFloat(transaction.amount),
-                        transaction.user || 'renu'
-                    ];
-                    
-                    await pgClient.query(sql, params);
-                    successCount++;
-                    
-                    // Update status periodically
-                    if (successCount % 10 === 0) {
-                        showStatus(`Migrating... ${successCount}/${data.length} records processed`);
-                    }
-                    
-                } catch (error) {
-                    console.error('Error migrating transaction:', transaction.id, error);
-                    errorCount++;
-                }
-            }
-            
-            showStatus(`Migration complete: ${successCount} successful, ${errorCount} failed`);
-            
-            // Load the migrated data
-            await loadFromNeon();
-            
-            return successCount > 0;
             
         } catch (error) {
-            console.error('Migration error:', error);
-            showStatus('Migration failed: ' + error.message);
+            console.error('Error saving to GitHub:', error);
             return false;
         }
     },
     
-    // Backup data from Neon to localStorage
-    backupToLocalStorage: async () => {
-        try {
-            // Check if Neon database is configured
-            const neonUrl = getSetting('neon_url');
-            const neonKey = getSetting('neon_key');
-            
-            if (!neonUrl || !neonKey) {
-                showStatus('Neon database not configured');
-                return false;
-            }
-            
-            // Initialize Neon if not already done
-            if (!pgClient || !isNeonConnected) {
-                const initialized = await initializeNeon();
-                if (!initialized) {
-                    showStatus('Failed to connect to Neon database');
-                    return false;
-                }
-            }
-            
-            showStatus('Backing up data from Neon database...');
-            
-            // Load all data from Neon
-            const sql = `
-                SELECT id, "createdAt", date, type, "desc", category, amount, "user"
-                FROM "wallet-app"
-                ORDER BY date DESC, "createdAt" DESC
-            `;
-            
-            const result = await pgClient.query(sql);
-            
-            if (result && result.rows) {
-                // Save to localStorage
-                const success = fallbackDB.save(result.rows);
-                
-                if (success) {
-                    showStatus(`Backup complete: ${result.rows.length} records saved to localStorage`);
-                    return true;
-                } else {
-                    showStatus('Backup failed: Could not save to localStorage');
-                    return false;
-                }
-            } else {
-                showStatus('No data found in Neon database to backup');
-                return false;
-            }
-            
-        } catch (error) {
-            console.error('Backup error:', error);
-            showStatus('Backup failed: ' + error.message);
-            return false;
+    // Add new transaction
+    add: async (transaction) => {
+        const data = await githubData.load();
+        data.push(transaction);
+        return await githubData.save(data);
+    },
+    
+    // Update transaction
+    update: async (id, updates) => {
+        const data = await githubData.load();
+        const index = data.findIndex(t => t.id === id);
+        if (index !== -1) {
+            data[index] = { ...data[index], ...updates };
+            return await githubData.save(data);
         }
+        return false;
+    },
+    
+    // Delete transaction
+    delete: async (id) => {
+        const data = await githubData.load();
+        const filtered = data.filter(t => t.id !== id);
+        return await githubData.save(filtered);
     }
 };
 
@@ -600,10 +350,6 @@ window.toggleSettings = function() {
         document.getElementById('gh-repo').value = getSetting('gh_repo') || '';
         document.getElementById('gh-filename').value = getSetting('gh_filename') || 'data.json';
         document.getElementById('gh-token').value = getSetting('gh_token') || '';
-        
-        // Load Neon database settings
-        document.getElementById('neon-url').value = getSetting('neon_url') || '';
-        document.getElementById('neon-key').value = getSetting('neon_key') || '';
     }
 }
 
@@ -613,73 +359,49 @@ window.saveSettings = function() {
     localStorage.setItem('gh_filename', document.getElementById('gh-filename').value);
     localStorage.setItem('gh_token', document.getElementById('gh-token').value);
     
-    // Save Neon database settings
-    localStorage.setItem('neon_url', document.getElementById('neon-url').value);
-    localStorage.setItem('neon_key', document.getElementById('neon-key').value);
-    
     toggleSettings();
     loadFromGitHub();
 }
 
-// Migration functions accessible from settings
-window.migrateDataToNeon = async function() {
-    if (!confirm('This will migrate all data from data.json to your Neon database. Continue?')) {
-        return;
-    }
-    
-    const success = await dataMigration.migrateToNeon();
-    if (success) {
-        alert('Data migration completed successfully!');
-    } else {
-        alert('Data migration failed. Please check your Neon database configuration.');
-    }
-}
-
-window.backupDataToLocalStorage = async function() {
-    if (!confirm('This will backup all data from Neon database to localStorage. Continue?')) {
-        return;
-    }
-    
-    const success = await dataMigration.backupToLocalStorage();
-    if (success) {
-        alert('Data backup completed successfully!');
-    } else {
-        alert('Data backup failed. Please check your Neon database configuration.');
-    }
-}
 
 function showStatus(msg) { document.getElementById('status-bar').innerText = msg; }
 
 async function loadFromGitHub() {
     if (!getPerm(getCurrentUser(), 'read')) { showStatus('No read permission'); return; }
     
-    // Check if Neon database is configured
-    const neonUrl = getSetting('neon_url');
-    const neonKey = getSetting('neon_key');
+    showStatus('Loading from data.json...');
     
-    if (neonUrl && neonKey) {
-        await loadFromNeon();
-    } else {
-        showStatus('Neon database not configured');
+    try {
+        transactions = await githubData.load();
+        // Ensure all transactions have a user field
+        transactions.forEach(t => { 
+            if (!t.user) t.user = 'renu'; 
+        });
+        showStatus(`Loaded ${transactions.length} records from data.json`);
+        updateUI();
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showStatus('Failed to load data: ' + error.message);
         transactions = [];
         updateUI();
     }
 }
-
 
 async function saveToGitHub() {
     showStatus('Saving...');
     const addBtn = document.getElementById('add-btn');
     if (addBtn) { addBtn.disabled = true; addBtn.innerText = 'Saving...'; }
     
-    // Check if Neon database is configured
-    const neonUrl = getSetting('neon_url');
-    const neonKey = getSetting('neon_key');
-    
-    if (neonUrl && neonKey) {
-        await saveToNeon();
-    } else {
-        showStatus('Neon database not configured');
+    try {
+        const success = await githubData.save(transactions);
+        if (success) {
+            showStatus('Saved to data.json');
+        } else {
+            showStatus('Failed to save - check GitHub settings');
+        }
+    } catch (error) {
+        console.error('Error saving data:', error);
+        showStatus('Failed to save: ' + error.message);
     }
     
     if (addBtn) { addBtn.disabled = false; addBtn.innerText = 'Add Transaction'; }
@@ -756,15 +478,8 @@ function removeTransaction(idx) {
         transactions.splice(idx, 1);
         updateUI();
         
-        // Check if Neon database is configured
-        const neonUrl = getSetting('neon_url');
-        const neonKey = getSetting('neon_key');
-        
-        if (neonUrl && neonKey) {
-            deleteFromNeon(transactionId);
-        } else {
-            showStatus('Neon database not configured');
-        }
+        // Save to GitHub data.json
+        githubData.delete(transactionId);
     }
 }
 
@@ -916,7 +631,7 @@ function addTransaction() {
     if(!amount || !date) return alert('Please fill date and amount');
     transactions.push({ id: Date.now(), createdAt: new Date().toISOString(), date, type, desc: desc || '', category, amount, user: getTrackUser() });
     updateUI();
-    saveToNeon();
+    githubData.add(transactions[transactions.length - 1]);
     document.getElementById('desc').value = '';
     document.getElementById('amount').value = '';
     setToday();
@@ -934,52 +649,20 @@ async function loadAllData() {
     document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#666;">Loading...</p>';
     
     try {
-        // Check if Neon database is configured
-        const neonUrl = getSetting('neon_url');
-        const neonKey = getSetting('neon_key');
+        // Load all data from GitHub data.json
+        const allData = await githubData.load();
+        document.getElementById('data-count').innerText = `Total records: ${allData.length}`;
         
-        if (neonUrl && neonKey) {
-            // Initialize Neon if not already done
-            if (!pgClient || !isNeonConnected) {
-                const initialized = await initializeNeon();
-                if (!initialized) {
-                    showStatus('Neon database not configured');
-                    document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#dc3545;">Neon database not configured</p>';
-                    return;
-                }
-            }
-            
-            // Load from Neon database
-            const sql = `
-                SELECT id, "createdAt", date, type, "desc", category, amount, "user"
-                FROM "wallet-app"
-                ORDER BY date DESC, "createdAt" DESC
-            `;
-            
-            const result = await pgClient.query(sql);
-            
-            if (result && result.rows) {
-                const allData = result.rows;
-                document.getElementById('data-count').innerText = `Total records: ${allData.length}`;
-                
-                if (allData.length === 0) {
-                    document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#999;">No data found in wallet-app table</p>';
-                    showStatus('No data found');
-                    return;
-                }
-                
-                // Create table HTML
-                const tableHtml = createDataTable(allData);
-                document.getElementById('all-data-list').innerHTML = tableHtml;
-                showStatus(`Loaded ${allData.length} records`);
-            } else {
-                document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#999;">No data found in wallet-app table</p>';
-                showStatus('No data found');
-            }
-        } else {
-            showStatus('Neon database not configured');
-            document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#dc3545;">Neon database not configured</p>';
+        if (allData.length === 0) {
+            document.getElementById('all-data-list').innerHTML = '<p style="text-align:center; color:#999;">No data found in data.json</p>';
+            showStatus('No data found');
+            return;
         }
+        
+        // Create table HTML
+        const tableHtml = createDataTable(allData);
+        document.getElementById('all-data-list').innerHTML = tableHtml;
+        showStatus(`Loaded ${allData.length} records`);
         
     } catch (error) {
         console.error('Error loading all data:', error);
@@ -1058,30 +741,14 @@ async function deleteRow(id) {
     if (!confirm('Are you sure you want to delete this record?')) return;
     
     try {
-        // Check if Neon database is configured
-        const neonUrl = getSetting('neon_url');
-        const neonKey = getSetting('neon_key');
+        // Delete from GitHub data.json
+        const success = await githubData.delete(id);
         
-        if (neonUrl && neonKey) {
-            // Initialize Neon if not already done
-            if (!pgClient || !isNeonConnected) {
-                const initialized = await initializeNeon();
-                if (!initialized) {
-                    alert('Neon database not configured');
-                    return;
-                }
-            }
-            
-            // Delete from Neon database
-            const sql = 'DELETE FROM "wallet-app" WHERE id = $1';
-            const params = [id];
-            
-            await pgClient.query(sql, params);
-            
+        if (success) {
             alert('Record deleted successfully');
             loadAllData(); // Refresh the data
         } else {
-            alert('Neon database not configured');
+            alert('Failed to delete record');
         }
     } catch (error) {
         console.error('Error deleting record:', error);
