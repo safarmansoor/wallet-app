@@ -303,7 +303,7 @@ function showApp() {
     // Initialize UI with current data
     updateUI();
 }
-function switchTrackUser() {
+window.switchTrackUser = function() {
     if (!isAdmin()) return;
     setTrackUser(document.getElementById('user-select').value);
     updateUI();
