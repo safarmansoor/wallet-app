@@ -366,9 +366,66 @@ window.saveSettings = function() {
 
 function showStatus(msg) { document.getElementById('status-bar').innerText = msg; }
 
+// Connection status management
+function updateConnectionStatus(status, text) {
+    const statusEl = document.getElementById('connection-status');
+    const dotEl = statusEl.querySelector('.status-dot');
+    const textEl = statusEl.querySelector('.status-text');
+    
+    // Remove existing status classes
+    dotEl.classList.remove('connected', 'syncing');
+    
+    if (status === 'connected') {
+        dotEl.classList.add('connected');
+        textEl.innerText = 'Connected';
+    } else if (status === 'syncing') {
+        dotEl.classList.add('syncing');
+        textEl.innerText = 'Syncing...';
+    } else {
+        textEl.innerText = 'Disconnected';
+    }
+}
+
+function checkConnection() {
+    // Check if GitHub credentials are configured
+    const hasCredentials = getSetting('gh_username') && getSetting('gh_repo') && getSetting('gh_token');
+    
+    if (!hasCredentials) {
+        updateConnectionStatus('disconnected');
+        return false;
+    }
+    
+    // Test connection by trying to fetch repository info
+    const username = getSetting('gh_username');
+    const repo = getSetting('gh_repo');
+    const token = getSetting('gh_token');
+    
+    fetch(`https://api.github.com/repos/${username}/${repo}`, {
+        headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            updateConnectionStatus('connected');
+            return true;
+        } else {
+            updateConnectionStatus('disconnected');
+            return false;
+        }
+    })
+    .catch(error => {
+        console.error('Connection check failed:', error);
+        updateConnectionStatus('disconnected');
+        return false;
+    });
+}
+
 async function loadFromGitHub() {
     if (!getPerm(getCurrentUser(), 'read')) { showStatus('No read permission'); return; }
     
+    updateConnectionStatus('syncing');
     showStatus('Loading from data.json...');
     
     try {
@@ -378,10 +435,12 @@ async function loadFromGitHub() {
             if (!t.user) t.user = 'renu'; 
         });
         showStatus(`Loaded ${transactions.length} records from data.json`);
+        updateConnectionStatus('connected');
         updateUI();
     } catch (error) {
         console.error('Error loading data:', error);
         showStatus('Failed to load data: ' + error.message);
+        updateConnectionStatus('disconnected');
         transactions = [];
         updateUI();
     }
@@ -680,10 +739,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (getCurrentUser()) {
         showApp();
+        // Check connection status after app loads
+        setTimeout(checkConnection, 1000);
     } else {
         // Show login screen by default
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('app').classList.remove('visible');
+        // Check connection status even on login screen
+        setTimeout(checkConnection, 1000);
     }
     setToday();
 });

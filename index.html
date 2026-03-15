@@ -32,7 +32,13 @@
         <div id="status-bar">Connecting...</div>
         <div id="main-content">
         <header class="app-header">
-            <h1>Wallet</h1>
+            <div class="app-title">
+                <h1>Wallet</h1>
+                <div id="connection-status" class="connection-status" title="Connection Status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Disconnected</span>
+                </div>
+            </div>
             <select id="user-select" onchange="switchTrackUser()" title="Track for user"></select>
             <nav class="app-nav">
             <button id="nav-dashboard" class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
