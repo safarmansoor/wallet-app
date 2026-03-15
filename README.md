@@ -1,129 +1,199 @@
-# Wallet App - Supabase Integration
+# Wallet App with Neon Database Integration
 
-This wallet application has been updated to support Supabase as a database backend while maintaining backward compatibility with GitHub sync.
+A modern wallet application with Neon database backend integration for managing financial transactions.
 
 ## Features
 
-- **Dual Database Support**: Can use either Supabase or GitHub for data storage
-- **User Management**: Multiple users with different permission levels
-- **Transaction Tracking**: Income, expense, and asset tracking
-- **Category Analysis**: View spending by category and month
-- **Real-time Sync**: Automatic synchronization with configured database
+- **User Authentication**: Secure login system with user management
+- **Transaction Management**: Add, view, edit, and delete transactions
+- **Multi-User Support**: Admin and regular user roles with permissions
+- **Data Visualization**: Category and monthly breakdowns
+- **Neon Database**: PostgreSQL database with SSL connections
+- **Backend API**: Express.js server with PostgreSQL integration
 
-## Setup Instructions
+## Project Structure
 
-### 1. Supabase Setup
+```
+wallet-app/
+├── index.html          # Main HTML structure
+├── styles.css          # CSS styling
+├── app.js             # Frontend JavaScript (Neon integration)
+├── server.js          # Backend API server
+├── package.json       # Backend dependencies
+├── neon-database-setup.sql  # Database schema
+└── README.md          # This file
+```
 
-1. **Create a Supabase Project**:
-   - Go to [Supabase](https://supabase.com) and create a new project
-   - Wait for the project to be ready (may take a few minutes)
+## Installation
 
-2. **Create the Database Table**:
-   - Go to your Supabase dashboard
-   - Navigate to SQL Editor
-   - Run the following SQL to create the wallet-app table:
+### Backend Setup
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Start the backend server:**
+   ```bash
+   # Development mode (with auto-restart)
+   npm run dev
+   
+   # Production mode
+   npm start
+   ```
+
+3. **Server will run on:** `http://localhost:3001`
+
+### Frontend Setup
+
+The frontend is a static HTML/CSS/JS application that runs in the browser.
+
+1. **Open `index.html`** in your browser
+2. **Configure Neon Database** in Settings:
+   - Enter your Neon database URL
+   - Enter your Neon database API key
+   - Save settings
+
+## Database Schema
+
+The application uses the following table structure:
 
 ```sql
-CREATE TABLE IF NOT EXISTS "wallet-app" (
+CREATE TABLE "wallet-app" (
     id BIGINT PRIMARY KEY,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    date DATE,
-    type VARCHAR(20),
+    createdAt TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    date DATE NOT NULL,
+    type VARCHAR(20) NOT NULL,
     desc TEXT,
-    category VARCHAR(100),
-    amount DECIMAL(10,2),
-    user VARCHAR(50)
+    category VARCHAR(50),
+    amount DECIMAL(10,2) NOT NULL,
+    user VARCHAR(50) NOT NULL
 );
 ```
 
-3. **Get Your Credentials**:
-   - Go to Settings → API in your Supabase dashboard
-   - Copy your Project URL and anon public key
+## API Endpoints
 
-### 2. Application Configuration
+### Backend API (`/api/database`)
 
-1. **Update Supabase Configuration**:
-   - Open `supabase-config.js`
-   - Replace `YOUR_SUPABASE_PROJECT_URL` with your actual project URL
-   - Replace `YOUR_SUPABASE_ANON_KEY` with your anon public key
+**POST** `/api/database` - Handle database operations
 
-2. **Configure in App**:
-   - Open the app and go to Settings (⚙ button)
-   - Go to GitHub & Users page
-   - Enter your Supabase URL and Anon Key in the Supabase Setup section
-   - Click "Save Supabase Settings"
+**Request Body:**
+```json
+{
+    "url": "postgresql://user:password@host:port/database",
+    "key": "your-api-key",
+    "operation": "select|upsert|delete",
+    "table": "wallet-app",
+    "fields": "*", // for select
+    "order": "date", // for select
+    "data": {}, // for upsert
+    "field": "id", // for delete
+    "value": 123 // for delete
+}
+```
 
-### 3. Data Migration
+**Response:**
+```json
+{
+    "data": [...],
+    "error": null
+}
+```
 
-To migrate your existing data from `data.json` to Supabase:
+### Health Check
 
-1. **Manual Import**:
-   - Go to Supabase dashboard
-   - Navigate to Table Editor
-   - Select the "wallet-app" table
-   - Click "Import" and upload your `data.json` file
-   - Map the fields appropriately
+**GET** `/api/health` - Check server status
 
-2. **Field Mapping**:
-   - `id` → id
-   - `createdAt` → created_at
-   - `date` → date
-   - `type` → type
-   - `desc` → desc
-   - `category` → category
-   - `amount` → amount
-   - `user` → user
+## Usage
 
-### 4. Usage
+1. **Login**: Use default users:
+   - Admin: `safar` / `safar1997`
+   - User: `renu` / `renu`
 
-1. **Login**: Use default users (safar/safar1997, renu/renu) or create your own
-2. **Add Transactions**: Use the dashboard to add income, expenses, or assets
-3. **View Reports**: Check category and monthly breakdowns
-4. **User Management**: Admin users can manage other users and permissions
+2. **Add Transactions**: Click "Add Transaction" and fill in the details
 
-## Database Priority
+3. **View Data**: See transactions in the dashboard with:
+   - Recent activity
+   - Category breakdown
+   - Monthly summary
+   - Asset, income, and expense totals
 
-The app follows this priority order:
-1. **Supabase** (if configured) - Primary database
-2. **GitHub** (if configured) - Fallback database
-3. **Local Storage** - Temporary storage only
+4. **Admin Features**:
+   - User management (add/edit/delete users)
+   - Permission settings
+   - View all data
+   - Export data to CSV
 
-## File Structure
+## Neon Database Setup
 
-- `index.html` - Main application interface
-- `app.js` - Application logic with Supabase integration
-- `styles.css` - Styling
-- `supabase-config.js` - Supabase configuration and client setup
-- `data.json` - Original data file (can be removed after migration)
+1. **Create Neon Project**: Go to [Neon.tech](https://neon.tech) and create a project
+2. **Get Connection String**: Copy the PostgreSQL connection string
+3. **Configure**: Enter the connection string in the app settings
+4. **Run Schema**: Execute the SQL from `neon-database-setup.sql`
+
+## Security Features
+
+- **CORS enabled** for frontend requests
+- **SSL connections** to Neon database
+- **Input validation** and error handling
+- **Connection pooling** for performance
+- **Secure credential handling**
+
+## Development
+
+### Backend Development
+
+```bash
+# Install development dependencies
+npm install
+
+# Start development server with auto-restart
+npm run dev
+
+# Start production server
+npm start
+```
+
+### Frontend Development
+
+The frontend uses vanilla JavaScript with no build tools required.
+
+### Database Development
+
+```bash
+# Connect to Neon database
+psql "your-connection-string"
+
+# Run schema setup
+\i neon-database-setup.sql
+```
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **CORS Errors**: Ensure your Supabase project has the correct URL in the allowed origins
-2. **Permission Errors**: Check that your anon key has the necessary permissions
-3. **Table Not Found**: Verify the table name is exactly "wallet-app" (case-sensitive)
+1. **CORS Errors**: Ensure frontend is served from a web server (not file://)
+2. **Database Connection**: Verify Neon credentials and SSL settings
+3. **Port Conflicts**: Change port in `server.js` if needed
 
-### Debug Mode
+### Logs
 
-Open browser developer tools to see:
-- Database connection status
-- Error messages
-- Sync operations
+- Backend logs show database queries and connection status
+- Frontend console shows API requests and responses
 
-## Security Notes
+## Dependencies
 
-- The anon key is public and should only have read/write permissions to the wallet-app table
-- For production, consider using Row Level Security (RLS) policies
-- Regularly rotate your API keys
+### Backend
+- `express`: Web framework
+- `pg`: PostgreSQL client
+- `cors`: Cross-origin resource sharing
+- `nodemon`: Development auto-restart
 
-## Backward Compatibility
+### Frontend
+- Vanilla JavaScript (no frameworks)
+- Browser localStorage for settings
+- Fetch API for HTTP requests
 
-The app maintains full backward compatibility with GitHub sync. If Supabase is not configured, it will automatically fall back to GitHub storage.
+## License
 
-## Support
-
-For issues related to:
-- **Supabase Setup**: Check [Supabase Documentation](https://supabase.com/docs)
-- **App Functionality**: Review the original GitHub sync instructions
-- **Data Migration**: Ensure proper field mapping during import
+MIT License - see LICENSE file for details.
