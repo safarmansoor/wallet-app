@@ -144,21 +144,7 @@ body {
     border: 1px solid #2A231D;
 }
 
-input[type="date"] {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  
-  /* If your input is inside a Flexbox or Grid container, this stops it from stretching */
-  min-width: 0; 
-}
 
-input[type="date"]::-webkit-datetime-edit {
-  display: block; /* Required for the overflow properties to work here */
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
 input,
 select {
     width: 100%;
@@ -182,6 +168,20 @@ select:focus {
 
 input[type="date"] {
     font-family: inherit;
+    width: 100%;
+    max-width: 100%;
+    -webkit-appearance: none; /* Resets iOS default styling */
+    appearance: none;
+    min-width: 0; /* Prevents flexbox stretch issues */
+}
+
+/* Add this right below it to handle the long text inside the date picker */
+input[type="date"]::-webkit-datetime-edit {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 button {
