@@ -2,22 +2,53 @@
 
 // Data operations using GitHub data.json file
 const githubData = {
-    // Load data from data.json file
+    // Load data from GitHub data.json file
     load: async () => {
         try {
-            const response = await fetch('data.json');
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            const githubToken = getSetting('gh_token');
+            const githubUsername = getSetting('gh_username');
+            const githubRepo = getSetting('gh_repo');
+            const filename = getSetting('gh_filename') || 'data.json';
+            
+            if (!githubToken || !githubUsername || !githubRepo) {
+                console.warn('GitHub credentials not configured for loading');
+                // Fallback to local data.json if GitHub credentials not set
+                try {
+                    const response = await fetch('data.json');
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data || [];
+                    }
+                } catch (e) {
+                    console.warn('Local data.json also not available');
+                }
+                return [];
             }
-            const data = await response.json();
+            
+            // Fetch from GitHub API
+            const response = await fetch(`https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${filename}`, {
+                headers: {
+                    'Authorization': `token ${githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`GitHub API Error: HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const fileData = await response.json();
+            const content = atob(fileData.content);
+            const data = JSON.parse(content);
             return data || [];
+            
         } catch (error) {
-            console.error('Error loading data.json:', error);
+            console.error('Error loading data from GitHub:', error);
             return [];
         }
     },
     
-    // Save data to data.json using GitHub API
+    // Save data to GitHub data.json file
     save: async (data) => {
         try {
             const githubToken = getSetting('gh_token');
@@ -435,8 +466,18 @@ async function loadFromGitHub() {
         updateUI();
     } catch (error) {
         console.error('Error loading data:', error);
-        updateConnectionStatus('disconnected');
-        transactions = [];
+        // Don't immediately set to disconnected - check if it's a connection issue
+        const hasCredentials = getSetting('gh_username') && getSetting('gh_repo') && getSetting('gh_token');
+        
+        if (hasCredentials) {
+            // If credentials are set but still failed, it's likely a connection issue
+            updateConnectionStatus('disconnected');
+        } else {
+            // If no credentials, it's expected behavior - keep as connected for local mode
+            updateConnectionStatus('connected');
+        }
+        
+        // Still update UI with whatever data we have (could be empty array)
         updateUI();
     }
 }
