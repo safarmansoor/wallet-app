@@ -241,6 +241,7 @@ async function doLogin() {
 window.logout = function() {
     setCurrentUser('');
     transactions = []; // Clear transactions on logout
+    
     // Clear UI
     document.getElementById('history-list').innerHTML = '';
     document.getElementById('total-asset').innerText = '0.00 AED';
@@ -251,7 +252,13 @@ window.logout = function() {
     document.getElementById('login-password').value = '';
     document.getElementById('login-screen').classList.remove('hidden');
     document.getElementById('app').classList.remove('visible');
-    toggleSettings();
+    
+    // Force modals to hide instead of toggling them
+    const settingsModal = document.getElementById('settings-modal');
+    if (settingsModal) settingsModal.style.display = 'none';
+    
+    const permsModal = document.getElementById('permissions-modal');
+    if (permsModal) permsModal.style.display = 'none';
 }
 
 window.showPage = function(page) {
