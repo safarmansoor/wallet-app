@@ -169,8 +169,9 @@ const githubData = {
 
 let transactions = [];
 
-// Default users
+// Default users with PINs
 const DEFAULT_USERS = { safar: 'safar1997', renu: 'renu' };
+const DEFAULT_PINS = { '7467': 'safar', '9999': 'renu' };
 const DEFAULT_ADMINS = ['safar'];
 const DEFAULT_PERMS = { safar: { read: 1, write: 1, view: 1, delete: 1 }, renu: { read: 1, write: 0, view: 1, delete: 0 } };
 
@@ -194,7 +195,7 @@ const getTrackUser = () => {
 const setTrackUser = (u) => sessionStorage.setItem('track_user', u);
 
 // Quick login function for one-click access
-window.quickLogin = function(username) {
+function quickLogin(username) {
     const password = getPassword(username);
     if (password) {
         // Set the form values and call doLogin
@@ -205,6 +206,93 @@ window.quickLogin = function(username) {
         const err = document.getElementById('login-error');
         err.textContent = 'User not found';
     }
+}
+
+// Login mode toggle function
+function switchLoginMode(mode) {
+    const pinSection = document.getElementById('pin-section');
+    const passwordSection = document.getElementById('password-section');
+    const pinModeBtn = document.getElementById('pin-mode-btn');
+    const passwordModeBtn = document.getElementById('password-mode-btn');
+    const loginError = document.getElementById('login-error');
+    
+    // Clear any existing errors
+    loginError.textContent = '';
+    
+    if (mode === 'pin') {
+        // Switch to PIN mode
+        pinSection.style.display = 'block';
+        passwordSection.style.display = 'none';
+        pinModeBtn.classList.add('active');
+        passwordModeBtn.classList.remove('active');
+        
+        // Clear password fields
+        document.getElementById('login-username').value = '';
+        document.getElementById('login-password').value = '';
+    } else {
+        // Switch to Password mode
+        pinSection.style.display = 'none';
+        passwordSection.style.display = 'block';
+        pinModeBtn.classList.remove('active');
+        passwordModeBtn.classList.add('active');
+        
+        // Clear PIN fields and indicators
+        document.getElementById('login-pin').value = '';
+        document.getElementById('pin-user-indicator').style.display = 'none';
+    }
+}
+
+// Expose functions to global window object for HTML onclick handlers
+window.quickLogin = quickLogin;
+window.switchLoginMode = switchLoginMode;
+
+// PIN-based login function
+function doPinLogin() {
+    const pinInput = document.getElementById('login-pin');
+    const pin = pinInput.value;
+    const err = document.getElementById('login-error');
+    const userIndicator = document.getElementById('pin-user-indicator');
+    
+    // Clear previous error
+    err.textContent = '';
+    
+    // Check if PIN is exactly 4 digits
+    if (!/^\d{4}$/.test(pin)) {
+        userIndicator.style.display = 'none';
+        return;
+    }
+    
+    // Check if PIN matches any user
+    const username = DEFAULT_PINS[pin] || null;
+    
+    if (!username) {
+        err.textContent = 'Invalid PIN';
+        userIndicator.style.display = 'none';
+        return;
+    }
+    
+    // Show user indicator
+    userIndicator.style.display = 'block';
+    userIndicator.textContent = `Logging in as: ${username}`;
+    userIndicator.style.color = username === 'safar' ? '#007bff' : '#28a745';
+    
+    // Auto-login after short delay to show the indicator
+    setTimeout(() => {
+        const password = getPassword(username);
+        if (password) {
+            // Simulate login process
+            setCurrentUser(username);
+            setTrackUser(username);
+            showApp();
+            
+            // Clear PIN input
+            pinInput.value = '';
+            userIndicator.style.display = 'none';
+        } else {
+            err.textContent = 'User configuration error';
+            userIndicator.style.display = 'none';
+        }
+    }, 300);
 }
 
 async function doLogin() {
@@ -457,7 +545,8 @@ function updateConnectionStatus(status, text) {
 // Make loadFromGitHub globally accessible for HTML buttons
 window.loadFromGitHub = loadFromGitHub;
 window.addTransaction = addTransaction;
-window.removeTransaction = removeTransaction
+window.removeTransaction = removeTransaction;
+
 
 function checkConnection() {
     // Check if GitHub credentials are configured
@@ -916,6 +1005,50 @@ document.addEventListener('DOMContentLoaded', function() {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             doLogin();
+        });
+    }
+    
+    // Add event listener for PIN input to enable auto-login
+    const pinInput = document.getElementById('login-pin');
+    if (pinInput) {
+        pinInput.addEventListener('input', function(e) {
+            doPinLogin();
+        });
+    }
+    
+    // Add event listeners for login mode buttons as backup to inline onclick
+    const pinModeBtn = document.getElementById('pin-mode-btn');
+    const passwordModeBtn = document.getElementById('password-mode-btn');
+    
+    if (pinModeBtn) {
+        pinModeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            switchLoginMode('pin');
+        });
+    }
+    
+    if (passwordModeBtn) {
+        passwordModeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            switchLoginMode('password');
+        });
+    }
+    
+    // Add event listeners for quick login buttons as backup to inline onclick
+    const safarBtn = document.querySelector('button[onclick*="quickLogin(\'safar\')"]');
+    const renuBtn = document.querySelector('button[onclick*="quickLogin(\'renu\')"]');
+    
+    if (safarBtn) {
+        safarBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            quickLogin('safar');
+        });
+    }
+    
+    if (renuBtn) {
+        renuBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            quickLogin('renu');
         });
     }
     

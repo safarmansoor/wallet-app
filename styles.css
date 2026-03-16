@@ -543,6 +543,36 @@ button:disabled {
     color: #2A231D;
 }
 
+.login-mode-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #2A231D;
+    background: #FFFFFF;
+    color: #2A231D;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+    background: #2A231D;
+    color: #FFFFFF;
+}
+
+.mode-btn.active {
+    background: #B89758;
+    color: #2A231D;
+    border-color: #B89758;
+}
+
 .login-box input {
     margin-bottom: 15px;
 }
