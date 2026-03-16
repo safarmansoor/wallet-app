@@ -450,6 +450,7 @@ function updateConnectionStatus(status, text) {
 // Make loadFromGitHub globally accessible for HTML buttons
 window.loadFromGitHub = loadFromGitHub;
 window.addTransaction = addTransaction;
+window.removeTransaction = removeTransaction
 
 function checkConnection() {
     // Check if GitHub credentials are configured
