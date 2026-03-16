@@ -990,13 +990,13 @@
     "user": "safar"
   },
   {
-    "id": 1773681802384,
-    "createdAt": "2026-03-16T17:23:22.384Z",
+    "id": 1773682040193,
+    "createdAt": "2026-03-16T17:27:20.193Z",
     "date": "2026-03-16",
     "type": "expense",
-    "desc": "tst",
-    "category": "test",
-    "amount": "10",
-    "user": "safar"
+    "desc": "March 8 to March 15 parking fees calculated all",
+    "category": "Parking",
+    "amount": "50",
+    "user": "renu"
   }
 ]
