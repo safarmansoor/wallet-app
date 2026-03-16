@@ -988,15 +988,5 @@
     "category": "Food",
     "amount": "26.5",
     "user": "safar"
-  },
-  {
-    "id": 1773681802384,
-    "createdAt": "2026-03-16T17:23:22.384Z",
-    "date": "2026-03-16",
-    "type": "expense",
-    "desc": "tst",
-    "category": "test",
-    "amount": "10",
-    "user": "safar"
   }
 ]
