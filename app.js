@@ -640,26 +640,48 @@ function addTransaction() {
         user: getTrackUser()
     };
     
-    // Add to local transactions array
-    transactions.push(newTransaction);
-    
-    // Update UI immediately
-    updateUI();
-    
-    // Save to GitHub
+    // First attempt to save to GitHub
     githubData.add(newTransaction).then(success => {
         if (success) {
+            // GitHub save successful - add to local array and update UI
+            transactions.push(newTransaction);
+            updateUI();
+            
             // Clear form fields after successful save
             document.getElementById('desc').value = '';
             document.getElementById('amount').value = '';
             document.getElementById('category').value = '';
             setToday();
+            
+            console.log('Transaction added successfully to GitHub and local storage');
         } else {
-            alert('Transaction added locally but failed to save to GitHub. Please try again.');
+            // GitHub save failed - add to local array as fallback
+            transactions.push(newTransaction);
+            updateUI();
+            
+            alert('Transaction saved locally but failed to sync with GitHub. Please check your connection and try again.');
+            console.warn('GitHub save failed, but transaction added locally');
+            
+            // Clear form fields even on GitHub failure
+            document.getElementById('desc').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('category').value = '';
+            setToday();
         }
     }).catch(error => {
-        console.error('Error saving transaction:', error);
-        alert('Transaction added locally but failed to save to GitHub. Please try again.');
+        console.error('Error saving transaction to GitHub:', error);
+        
+        // GitHub save failed - add to local array as fallback
+        transactions.push(newTransaction);
+        updateUI();
+        
+        alert('Transaction saved locally but failed to sync with GitHub. Please check your connection and try again.');
+        
+        // Clear form fields even on GitHub failure
+        document.getElementById('desc').value = '';
+        document.getElementById('amount').value = '';
+        document.getElementById('category').value = '';
+        setToday();
     });
 }
 
