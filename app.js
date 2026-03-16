@@ -495,6 +495,30 @@ function checkConnection() {
     });
 }
 
+// Migration function to add status field to existing transactions
+function migrateTransactions() {
+    let needsMigration = false;
+    transactions.forEach(t => {
+        if (!t.status) {
+            t.status = 'active';
+            needsMigration = true;
+        }
+    });
+    
+    if (needsMigration) {
+        // Save the migrated data back to GitHub
+        githubData.save(transactions).then(success => {
+            if (success) {
+                console.log('Transaction migration completed: added status field to existing transactions');
+            } else {
+                console.warn('Transaction migration failed: could not save updated transactions');
+            }
+        }).catch(error => {
+            console.error('Transaction migration error:', error);
+        });
+    }
+}
+
 async function loadFromGitHub() {
     if (!getPerm(getCurrentUser(), 'read')) { return; }
     
@@ -506,6 +530,10 @@ async function loadFromGitHub() {
         transactions.forEach(t => { 
             if (!t.user) t.user = 'renu'; 
         });
+        
+        // Migrate existing transactions to add status field
+        migrateTransactions();
+        
         updateConnectionStatus('connected');
         // Only update UI after data is successfully loaded
         updateUI();
@@ -549,7 +577,8 @@ async function saveToGitHub() {
 
 function updateUI() {
     const trackUser = getTrackUser();
-    const filtered = transactions.filter(t => (t.user || 'renu') === trackUser);
+    // Filter transactions by user and exclude cancelled ones from main view
+    const filtered = transactions.filter(t => (t.user || 'renu') === trackUser && (t.status || 'active') !== 'cancelled');
     document.getElementById('history-list').innerHTML = '';
     let asset = 0, inc = 0, exp = 0;
     filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -612,13 +641,28 @@ function updateUI() {
 
 function removeTransaction(idx) {
     if (!getPerm(getCurrentUser(), 'delete')) return;
-    if (confirm('Delete this transaction?')) {
+    if (confirm('Mark this transaction as cancelled?')) {
         const transactionId = transactions[idx].id;
-        transactions.splice(idx, 1);
-        updateUI();
         
-        // Save to GitHub data.json
-        githubData.delete(transactionId);
+        // Mark transaction as cancelled instead of deleting it
+        transactions[idx].status = 'cancelled';
+        
+        // Update the transaction in GitHub
+        githubData.update(transactionId, { status: 'cancelled' }).then(success => {
+            if (success) {
+                updateUI();
+                console.log('Transaction marked as cancelled successfully');
+            } else {
+                alert('Failed to mark transaction as cancelled. Please try again.');
+                // Revert the status change if GitHub update failed
+                transactions[idx].status = 'active';
+            }
+        }).catch(error => {
+            console.error('Error marking transaction as cancelled:', error);
+            alert('Failed to mark transaction as cancelled. Please check your connection and try again.');
+            // Revert the status change if GitHub update failed
+            transactions[idx].status = 'active';
+        });
     }
 }
 
@@ -655,7 +699,8 @@ function addTransaction() {
         desc: desc || '',
         category: category || 'Uncategorized',
         amount: amount,
-        user: getTrackUser()
+        user: getTrackUser(),
+        status: 'active'
     };
     
     // Add to local transactions array first
