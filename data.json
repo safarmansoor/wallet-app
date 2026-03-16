@@ -988,15 +988,5 @@
     "category": "Food",
     "amount": "26.5",
     "user": "safar"
-  },
-  {
-    "id": 1773682014932,
-    "createdAt": "2026-03-16T17:26:54.932Z",
-    "date": "2026-03-16",
-    "type": "expense",
-    "desc": "March 8 to March 15 parking fees calculated all",
-    "category": "Parking",
-    "amount": "50",
-    "user": "renu"
   }
 ]
