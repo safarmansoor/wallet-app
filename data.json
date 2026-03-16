@@ -7,7 +7,8 @@
     "desc": "",
     "category": "Parking",
     "amount": "28",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770489533945,
@@ -17,7 +18,8 @@
     "desc": "Items to send to Nepal (Purna travelling)",
     "category": "Entertainment",
     "amount": "500",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770487240144,
@@ -27,7 +29,8 @@
     "desc": "",
     "category": "Salary",
     "amount": "900",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770489594973,
@@ -37,7 +40,8 @@
     "desc": "used laptop from jnp",
     "category": "Entertainment",
     "amount": "1175",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770491076735,
@@ -47,7 +51,8 @@
     "desc": "sick leave day",
     "category": "Parking",
     "amount": "45",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770487212246,
@@ -57,7 +62,8 @@
     "desc": "purna visit",
     "category": "Entertainment",
     "amount": "50",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770487165275,
@@ -67,7 +73,8 @@
     "desc": "Bought gold through bank app, 0.12 XAU, price of 1 XAU = 19778.4699",
     "category": "Investment",
     "amount": "2373.42",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770489115502,
@@ -77,7 +84,8 @@
     "desc": "Bought gold through bank app, 0.12 XAU, price of 1 XAU = 19778.4699v",
     "category": "Investment",
     "amount": "2373.42",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770486985244,
@@ -87,7 +95,8 @@
     "desc": "purna visit",
     "category": "Entertainment",
     "amount": "75",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770491063484,
@@ -97,7 +106,8 @@
     "desc": "",
     "category": "Parking",
     "amount": "26.3",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770486797674,
@@ -107,7 +117,8 @@
     "desc": "shoes for xmas gift for colleague",
     "category": "Salary",
     "amount": "300",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770491042698,
@@ -117,7 +128,8 @@
     "desc": "",
     "category": "Parking",
     "amount": "23",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770486699778,
@@ -127,7 +139,8 @@
     "desc": "",
     "category": "Salary",
     "amount": "1000",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770489399910,
@@ -137,7 +150,8 @@
     "desc": "Christmas gift from company",
     "category": "Gift",
     "amount": "22500",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770491027149,
@@ -147,7 +161,8 @@
     "desc": "",
     "category": "Parking",
     "amount": "28",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770491089408,
@@ -157,7 +172,8 @@
     "desc": "fine for non renewal",
     "category": "Parking",
     "amount": "100",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770491016743,
@@ -167,7 +183,8 @@
     "desc": "",
     "category": "Parking",
     "amount": "11",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770491007303,
@@ -177,7 +194,8 @@
     "desc": "",
     "category": "Parking",
     "amount": "28",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770485761422,
@@ -187,7 +205,8 @@
     "desc": "",
     "category": "Telecom",
     "amount": "10",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770486531988,
@@ -197,7 +216,8 @@
     "desc": "",
     "category": "Salary",
     "amount": "600",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770485740582,
@@ -207,7 +227,8 @@
     "desc": "for aster, taxi, etc that day",
     "category": "Transport",
     "amount": "100",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770485556256,
@@ -217,7 +238,8 @@
     "desc": "travelling in bus",
     "category": "Transport",
     "amount": "50",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770484716050,
@@ -227,7 +249,8 @@
     "desc": "",
     "category": "Salary",
     "amount": "750",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770485398467,
@@ -237,7 +260,8 @@
     "desc": "Du Bill Cancellation",
     "category": "Telecom",
     "amount": "250",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770503498590,
@@ -247,7 +271,8 @@
     "desc": "for coming ajman nol card",
     "category": "Transport",
     "amount": "25",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770484695507,
@@ -257,7 +282,8 @@
     "desc": "",
     "category": "Salary",
     "amount": "600",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770484675298,
@@ -267,7 +293,8 @@
     "desc": "",
     "category": "Salary",
     "amount": "500",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770580088767,
@@ -277,7 +304,8 @@
     "desc": "Changed front suspension spring to oem",
     "category": "Car Mods",
     "amount": "100",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770580104901,
@@ -287,7 +315,8 @@
     "desc": "Car ac issue (gas 100 + 30 bush for leak)",
     "category": "Car Mods",
     "amount": "130",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770580124072,
@@ -297,7 +326,8 @@
     "desc": "Virgin olive oil + jeera seeds",
     "category": "Health",
     "amount": "13",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770664865611,
@@ -307,7 +337,8 @@
     "desc": "Banana + sausage sandwich",
     "category": "Food",
     "amount": "3",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770664933753,
@@ -317,7 +348,8 @@
     "desc": "Chai",
     "category": "Food",
     "amount": "3",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770664951782,
@@ -327,7 +359,8 @@
     "desc": "Banana and apple afternoon",
     "category": "Food",
     "amount": "2",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770666394596,
@@ -337,7 +370,8 @@
     "desc": "Shoes",
     "category": "Fashion",
     "amount": "165",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770666458678,
@@ -347,7 +381,8 @@
     "desc": "Bulb + lamp",
     "category": "Room",
     "amount": "106",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770704658473,
@@ -357,7 +392,8 @@
     "desc": "Croissant + banana",
     "category": "Food",
     "amount": "4",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770708061098,
@@ -367,7 +403,8 @@
     "desc": "Gold at 1.78 XAU",
     "category": "Gold",
     "amount": "33946.23",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770708102762,
@@ -377,7 +414,8 @@
     "desc": "Adcb",
     "category": "Fixed Deposit",
     "amount": "10319.44",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770708145842,
@@ -387,7 +425,8 @@
     "desc": "Prypco",
     "category": "Property",
     "amount": "8557.75",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770708184647,
@@ -397,7 +436,8 @@
     "desc": "Xcube",
     "category": "Stock",
     "amount": "2064.94",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770741595119,
@@ -407,7 +447,8 @@
     "desc": "Chai",
     "category": "Food",
     "amount": "2",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770741628430,
@@ -417,7 +458,8 @@
     "desc": "received back from salman",
     "category": "Cash",
     "amount": "10",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770821218020,
@@ -427,7 +469,8 @@
     "desc": "Apple banana",
     "category": "Food",
     "amount": "2",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770821253898,
@@ -437,7 +480,8 @@
     "desc": "Received back from salman",
     "category": "Cash",
     "amount": "4",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770872687325,
@@ -447,7 +491,8 @@
     "desc": "Croissant 2 , banana apple",
     "category": "Food",
     "amount": "7",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770872699460,
@@ -457,7 +502,8 @@
     "desc": "Ddf",
     "category": "Lotto",
     "amount": "50",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770908884419,
@@ -467,7 +513,8 @@
     "desc": "Mom kuri",
     "category": "India",
     "amount": "615.75",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770913926308,
@@ -477,7 +524,8 @@
     "desc": "Chai",
     "category": "Food",
     "amount": "2",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770974343984,
@@ -487,7 +535,8 @@
     "desc": "Car wash",
     "category": "Car",
     "amount": "10",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1770977100879,
@@ -497,7 +546,8 @@
     "desc": "Car wash tips",
     "category": "Car",
     "amount": "5",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1770977119128,
@@ -507,7 +557,8 @@
     "desc": "Car wash tips",
     "category": "Car",
     "amount": "5",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771063059103,
@@ -517,7 +568,8 @@
     "desc": "",
     "category": "Parking",
     "amount": "28",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1771063357587,
@@ -527,7 +579,8 @@
     "desc": "Ginger shots 4 pcs",
     "category": "Food",
     "amount": "14",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771063369151,
@@ -537,7 +590,8 @@
     "desc": "Sausage sandwich 2 pcs ",
     "category": "Food",
     "amount": "10",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771068111840,
@@ -547,7 +601,8 @@
     "desc": "Father expenses (gift)",
     "category": "India",
     "amount": "500",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771176342386,
@@ -557,7 +612,8 @@
     "desc": "Petrol",
     "category": "Car",
     "amount": "123",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771176350441,
@@ -567,7 +623,8 @@
     "desc": "Banana",
     "category": "Food",
     "amount": "2",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771176369288,
@@ -577,7 +634,8 @@
     "desc": "Roti, sabzi",
     "category": "Food",
     "amount": "10",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771226734046,
@@ -587,7 +645,8 @@
     "desc": "Banana 2 + apple",
     "category": "Food",
     "amount": "3",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771226749070,
@@ -597,7 +656,8 @@
     "desc": "Data 1 month",
     "category": "Telecom",
     "amount": "50",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771241522964,
@@ -607,7 +667,8 @@
     "desc": "Baku",
     "category": "Travel",
     "amount": "764",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771241533988,
@@ -617,7 +678,8 @@
     "desc": "Baku",
     "category": "Travel",
     "amount": "764",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1771245850888,
@@ -627,7 +689,8 @@
     "desc": "Banana + apple",
     "category": "Food",
     "amount": "4",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771259149537,
@@ -637,7 +700,8 @@
     "desc": "Sticker for back pain while doing squats",
     "category": "Health",
     "amount": "4.50",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771259177581,
@@ -647,7 +711,8 @@
     "desc": "1 litre milk",
     "category": "Food",
     "amount": "3.5",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771310810513,
@@ -657,7 +722,8 @@
     "desc": "Banana 2 + apple",
     "category": "Food",
     "amount": "3",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771335869389,
@@ -667,7 +733,8 @@
     "desc": "Car wash",
     "category": "Car",
     "amount": "10",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771838755305,
@@ -677,7 +744,8 @@
     "desc": "Etisalat recharge",
     "category": "Telecom",
     "amount": "10",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1771919782920,
@@ -687,7 +755,8 @@
     "desc": "Dukkan biryani after coming from baku",
     "category": "Food",
     "amount": "12",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1771924808276,
@@ -697,7 +766,8 @@
     "desc": "Detergent",
     "category": "Utilities",
     "amount": "4",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772010809021,
@@ -707,7 +777,8 @@
     "desc": "Debt to amir (he will pay on 28th)",
     "category": "Debt",
     "amount": "700",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772010831635,
@@ -717,7 +788,8 @@
     "desc": "(I need to eat)",
     "category": "Food",
     "amount": "50",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1772011010460,
@@ -727,7 +799,8 @@
     "desc": "Battery charger + tire inflator",
     "category": "Car",
     "amount": "269.99",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772034643901,
@@ -737,7 +810,8 @@
     "desc": "Mom",
     "category": "India",
     "amount": "1050.08",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772037720573,
@@ -747,7 +821,8 @@
     "desc": "Trimmer and scissors",
     "category": "Health",
     "amount": "100",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772100708453,
@@ -757,7 +832,8 @@
     "desc": "Afnan night out Perfume 2nd installment",
     "category": "Fashion",
     "amount": "45",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772183067441,
@@ -767,7 +843,8 @@
     "desc": "Recharge",
     "category": "Telecom",
     "amount": "10",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1772191541066,
@@ -777,7 +854,8 @@
     "desc": "Petrol",
     "category": "Car",
     "amount": "113.01",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772207456136,
@@ -787,7 +865,8 @@
     "desc": "",
     "category": "Salary",
     "amount": "750",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1772234512097,
@@ -797,7 +876,8 @@
     "desc": "Sabzi roti bataka",
     "category": "Food",
     "amount": "15",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772284840587,
@@ -807,7 +887,8 @@
     "desc": "Haircut",
     "category": "Health",
     "amount": "25",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772284880553,
@@ -817,7 +898,8 @@
     "desc": "Alignment (abrar tyres)",
     "category": "Car",
     "amount": "60",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772296165614,
@@ -827,7 +909,8 @@
     "desc": "Veg biryani",
     "category": "Food",
     "amount": "15",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772384319535,
@@ -837,7 +920,8 @@
     "desc": "War times day",
     "category": "Food",
     "amount": "82",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772485878067,
@@ -847,7 +931,8 @@
     "desc": "Sausage + noodles",
     "category": "Food",
     "amount": "15",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772485913951,
@@ -857,7 +942,8 @@
     "desc": "Sev puri + roti + paneer butter masala",
     "category": "Food",
     "amount": "35",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772485940415,
@@ -867,7 +953,8 @@
     "desc": "Big ticket",
     "category": "Lotto",
     "amount": "25",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772485988203,
@@ -877,7 +964,8 @@
     "desc": "Big ticket (salman)",
     "category": "Debt",
     "amount": "25",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772560798522,
@@ -887,7 +975,8 @@
     "desc": "Received back from Amir (300 remaining balance)",
     "category": "Debt",
     "amount": "400",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772694097651,
@@ -897,7 +986,8 @@
     "desc": "Paid back big ticket",
     "category": "Debt",
     "amount": "25",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772750629532,
@@ -907,7 +997,8 @@
     "desc": "Pak dxb",
     "category": "Food",
     "amount": "24.50",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772750638553,
@@ -917,7 +1008,8 @@
     "desc": "Fruit salad for sehri",
     "category": "Food",
     "amount": "18.36",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772969886473,
@@ -927,7 +1019,8 @@
     "desc": "",
     "category": "Parking",
     "amount": "26",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1772969921387,
@@ -937,7 +1030,8 @@
     "desc": "",
     "category": "Parking",
     "amount": "26",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   },
   {
     "id": 1772970273106,
@@ -947,7 +1041,8 @@
     "desc": "Isagbol",
     "category": "Food",
     "amount": "4.99",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1772970299809,
@@ -957,7 +1052,8 @@
     "desc": "Fruit salad + yogurt + renu soap",
     "category": "Food",
     "amount": "28.66",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1773006885488,
@@ -967,7 +1063,8 @@
     "desc": "Car wash",
     "category": "Car",
     "amount": "10",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1773042885382,
@@ -977,7 +1074,8 @@
     "desc": "Ddf",
     "category": "Lotto",
     "amount": "50",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1773042937429,
@@ -987,7 +1085,8 @@
     "desc": "Sehri pak dxb",
     "category": "Food",
     "amount": "26.5",
-    "user": "safar"
+    "user": "safar",
+    "status": "active"
   },
   {
     "id": 1773682040193,
@@ -997,6 +1096,7 @@
     "desc": "March 8 to March 15 parking fees calculated all",
     "category": "Parking",
     "amount": "50",
-    "user": "renu"
+    "user": "renu",
+    "status": "active"
   }
 ]
