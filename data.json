@@ -1098,5 +1098,16 @@
     "amount": "50",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1773682894330,
+    "createdAt": "2026-03-16T17:41:34.330Z",
+    "date": "2026-03-16",
+    "type": "expense",
+    "desc": "test",
+    "category": "test",
+    "amount": "10",
+    "user": "safar",
+    "status": "active"
   }
 ]
