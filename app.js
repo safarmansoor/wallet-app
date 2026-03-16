@@ -72,6 +72,7 @@ const githubData = {
     },
     
     // Save data to GitHub data.json file
+    // Save data to GitHub data.json file
     save: async (data) => {
         try {
             const githubToken = getSetting('gh_token');
@@ -84,12 +85,13 @@ const githubData = {
                 return false;
             }
             
-            // Get current file info
+            // Added cache: 'no-store' to prevent stale SHA errors on back-to-back saves
             const fileResponse = await fetch(`https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${filename}`, {
                 headers: {
                     'Authorization': `token ${githubToken}`,
                     'Accept': 'application/vnd.github.v3+json'
-                }
+                },
+                cache: 'no-store'
             });
             
             let sha = null;
@@ -101,6 +103,18 @@ const githubData = {
             // Prepare data
             const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
             
+            // Build request body dynamically to avoid sending 'sha: null'
+            const requestBody = {
+                message: 'Update wallet data via web app',
+                content: content,
+                branch: 'main' // NOTE: Change to 'master' if your GitHub repo uses master
+            };
+            
+            // Only attach the SHA if the file already exists
+            if (sha) {
+                requestBody.sha = sha;
+            }
+            
             // Update file
             const updateResponse = await fetch(`https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${filename}`, {
                 method: 'PUT',
@@ -109,12 +123,7 @@ const githubData = {
                     'Accept': 'application/vnd.github.v3+json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    message: 'Update wallet data via web app',
-                    content: content,
-                    sha: sha,
-                    branch: 'main'
-                })
+                body: JSON.stringify(requestBody)
             });
             
             if (updateResponse.ok) {
