@@ -58,7 +58,7 @@
             <div class="card balance" id="balance-card"><h3>Cash Balance</h3><p id="total-balance">0.00 AED</p></div>
         </div>
         <div class="input-group" id="add-transaction-form">
-            <form id="tx-form" onsubmit="addTransaction(); return false;">
+            <form id="tx-form" onsubmit="event.preventDefault(); addTransaction();">
                 <input type="date" id="t-date" required>
                 <select id="type">
                     <option value="expense">Expense (-)</option>
@@ -71,7 +71,7 @@
                 </datalist>
                 <input type="number" id="amount" placeholder="Amount" step="0.01" inputmode="decimal" required>
                 <input type="text" id="desc" placeholder="Description (optional)">
-                <button id="add-btn" type="submit">Add Transaction</button>
+                <button id="add-btn" type="button" onclick="addTransaction()">Add Transaction</button>
             </form>
         </div>
         <div class="list-header">Recent Activity</div>
