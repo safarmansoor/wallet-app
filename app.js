@@ -640,29 +640,28 @@ function addTransaction() {
         user: getTrackUser()
     };
     
-    // First attempt to save to GitHub
+    // Add to local transactions array first
+    transactions.push(newTransaction);
+    
+    // Update UI immediately to provide user feedback
+    updateUI();
+    
+    // Attempt to save to GitHub
     githubData.add(newTransaction).then(success => {
         if (success) {
-            // GitHub save successful - add to local array and update UI
-            transactions.push(newTransaction);
-            updateUI();
-            
-            // Clear form fields after successful save
+            // GitHub save successful - clear form fields
             document.getElementById('desc').value = '';
             document.getElementById('amount').value = '';
             document.getElementById('category').value = '';
             setToday();
             
-            console.log('Transaction added successfully to GitHub and local storage');
+            console.log('Transaction added successfully to both GitHub and local storage');
         } else {
-            // GitHub save failed - add to local array as fallback
-            transactions.push(newTransaction);
-            updateUI();
+            // GitHub save failed - show warning but keep transaction in local array
+            alert('Transaction added locally but failed to sync with GitHub. Please check your connection and try again.');
+            console.warn('GitHub save failed, transaction kept locally');
             
-            alert('Transaction saved locally but failed to sync with GitHub. Please check your connection and try again.');
-            console.warn('GitHub save failed, but transaction added locally');
-            
-            // Clear form fields even on GitHub failure
+            // Clear form fields even on GitHub failure to allow user to add another transaction
             document.getElementById('desc').value = '';
             document.getElementById('amount').value = '';
             document.getElementById('category').value = '';
@@ -671,13 +670,10 @@ function addTransaction() {
     }).catch(error => {
         console.error('Error saving transaction to GitHub:', error);
         
-        // GitHub save failed - add to local array as fallback
-        transactions.push(newTransaction);
-        updateUI();
+        // GitHub save failed - show warning but keep transaction in local array
+        alert('Transaction added locally but failed to sync with GitHub. Please check your connection and try again.');
         
-        alert('Transaction saved locally but failed to sync with GitHub. Please check your connection and try again.');
-        
-        // Clear form fields even on GitHub failure
+        // Clear form fields even on GitHub failure to allow user to add another transaction
         document.getElementById('desc').value = '';
         document.getElementById('amount').value = '';
         document.getElementById('category').value = '';
