@@ -21,14 +21,11 @@
             </div>
             
             <form id="login-form">
-                <!-- PIN Login Section -->
+            <!-- PIN Login Section -->
                 <div id="pin-section">
+                    <input type="text" id="login-username-pin" placeholder="Username" style="margin-bottom: 10px;">
                     <input type="password" id="login-pin" placeholder="Enter PIN (4 digits)" inputmode="numeric" maxlength="4" autocomplete="one-time-code">
                     <div id="pin-user-indicator" class="user-indicator" style="display: none; margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px; text-align: center; font-weight: bold;"></div>
-                    <div class="quick-login-buttons" style="display: flex; gap: 10px; margin-top: 15px;">
-                        <button type="button" onclick="quickLogin('safar')" style="flex: 1; background: #007bff; color: white;">Safar</button>
-                        <button type="button" onclick="quickLogin('renu')" style="flex: 1; background: #28a745; color: white;">Renu</button>
-                    </div>
                 </div>
                 
                 <!-- Password Login Section -->

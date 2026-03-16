@@ -249,7 +249,9 @@ window.switchLoginMode = switchLoginMode;
 // PIN-based login function
 function doPinLogin() {
     const pinInput = document.getElementById('login-pin');
+    const usernameInput = document.getElementById('login-username-pin');
     const pin = pinInput.value;
+    const typedUsername = (usernameInput.value || '').trim().toLowerCase();
     const err = document.getElementById('login-error');
     const userIndicator = document.getElementById('pin-user-indicator');
     
@@ -263,30 +265,38 @@ function doPinLogin() {
     }
     
     // Check if PIN matches any user
-    const username = DEFAULT_PINS[pin] || null;
+    const expectedUsername = DEFAULT_PINS[pin] || null;
     
-    if (!username) {
+    if (!expectedUsername) {
         err.textContent = 'Invalid PIN';
+        userIndicator.style.display = 'none';
+        return;
+    }
+    
+    // Check if typed username matches the PIN
+    if (typedUsername && typedUsername !== expectedUsername) {
+        err.textContent = `Username mismatch. PIN ${pin} is for user '${expectedUsername}', not '${typedUsername}'`;
         userIndicator.style.display = 'none';
         return;
     }
     
     // Show user indicator
     userIndicator.style.display = 'block';
-    userIndicator.textContent = `Logging in as: ${username}`;
-    userIndicator.style.color = username === 'safar' ? '#007bff' : '#28a745';
+    userIndicator.textContent = `Logging in as: ${expectedUsername}`;
+    userIndicator.style.color = expectedUsername === 'safar' ? '#007bff' : '#28a745';
     
     // Auto-login after short delay to show the indicator
     setTimeout(() => {
-        const password = getPassword(username);
+        const password = getPassword(expectedUsername);
         if (password) {
             // Simulate login process
-            setCurrentUser(username);
-            setTrackUser(username);
+            setCurrentUser(expectedUsername);
+            setTrackUser(expectedUsername);
             showApp();
             
-            // Clear PIN input
+            // Clear inputs
             pinInput.value = '';
+            usernameInput.value = '';
             userIndicator.style.display = 'none';
         } else {
             err.textContent = 'User configuration error';
