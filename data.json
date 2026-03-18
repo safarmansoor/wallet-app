@@ -1153,5 +1153,16 @@
     "amount": "764",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1773852713747,
+    "createdAt": "2026-03-18T16:51:53.747Z",
+    "date": "2026-03-15",
+    "type": "expense",
+    "desc": "Mom donations",
+    "category": "India",
+    "amount": "250",
+    "user": "safar",
+    "status": "active"
   }
 ]
