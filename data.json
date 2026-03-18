@@ -1109,5 +1109,16 @@
     "amount": "10",
     "user": "safar",
     "status": "cancelled"
+  },
+  {
+    "id": 1773852385673,
+    "createdAt": "2026-03-18T16:46:25.673Z",
+    "date": "2026-03-18",
+    "type": "expense",
+    "desc": "Haircut + tips",
+    "category": "Fashion",
+    "amount": "50",
+    "user": "safar",
+    "status": "active"
   }
 ]
