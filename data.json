@@ -1120,5 +1120,16 @@
     "amount": "50",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1773852407358,
+    "createdAt": "2026-03-18T16:46:47.358Z",
+    "date": "2026-03-18",
+    "type": "expense",
+    "desc": "Car wash + tips",
+    "category": "Car",
+    "amount": "25",
+    "user": "safar",
+    "status": "active"
   }
 ]
