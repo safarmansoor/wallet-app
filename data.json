@@ -1142,5 +1142,16 @@
     "amount": "50",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1773852534049,
+    "createdAt": "2026-03-18T16:48:54.049Z",
+    "date": "2026-03-16",
+    "type": "expense",
+    "desc": "Baku",
+    "category": "Travel",
+    "amount": "764",
+    "user": "safar",
+    "status": "active"
   }
 ]
