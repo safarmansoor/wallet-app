@@ -1131,5 +1131,16 @@
     "amount": "25",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1773852458445,
+    "createdAt": "2026-03-18T16:47:38.445Z",
+    "date": "2026-03-18",
+    "type": "expense",
+    "desc": "Data + 75 mins",
+    "category": "Telecom",
+    "amount": "50",
+    "user": "safar",
+    "status": "active"
   }
 ]
