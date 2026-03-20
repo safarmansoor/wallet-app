@@ -1186,5 +1186,16 @@
     "amount": "764",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1773998713753,
+    "createdAt": "2026-03-20T09:25:13.753Z",
+    "date": "2026-03-20",
+    "type": "expense",
+    "desc": "Transferred to bank for tabby",
+    "category": "Bank",
+    "amount": "400",
+    "user": "renu",
+    "status": "active"
   }
 ]
