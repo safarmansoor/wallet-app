@@ -1230,5 +1230,16 @@
     "amount": "17.47",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774214855702,
+    "createdAt": "2026-03-22T21:27:35.702Z",
+    "date": "2026-03-21",
+    "type": "expense",
+    "desc": "Madina ajm - lentils 1.10 + bottle guard + cutting board",
+    "category": "Food",
+    "amount": "10.48",
+    "user": "safar",
+    "status": "active"
   }
 ]
