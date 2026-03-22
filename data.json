@@ -1241,5 +1241,16 @@
     "amount": "10.48",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774214897458,
+    "createdAt": "2026-03-22T21:28:17.458Z",
+    "date": "2026-03-19",
+    "type": "expense",
+    "desc": "Paki restaurant",
+    "category": "Food",
+    "amount": "13",
+    "user": "safar",
+    "status": "active"
   }
 ]
