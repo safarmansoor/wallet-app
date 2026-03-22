@@ -1219,5 +1219,16 @@
     "amount": "995",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774214777536,
+    "createdAt": "2026-03-22T21:26:17.536Z",
+    "date": "2026-03-22",
+    "type": "expense",
+    "desc": "Granola + milk + flosser",
+    "category": "Food",
+    "amount": "17.47",
+    "user": "safar",
+    "status": "active"
   }
 ]
