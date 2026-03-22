@@ -1197,5 +1197,16 @@
     "amount": "400",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1774214537919,
+    "createdAt": "2026-03-22T21:22:17.919Z",
+    "date": "2026-03-22",
+    "type": "expense",
+    "desc": "Petrol",
+    "category": "Car",
+    "amount": "102",
+    "user": "safar",
+    "status": "active"
   }
 ]
