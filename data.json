@@ -1208,5 +1208,16 @@
     "amount": "102",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774214661461,
+    "createdAt": "2026-03-22T21:24:21.461Z",
+    "date": "2026-03-19",
+    "type": "expense",
+    "desc": "Mom + tax 11000 rs",
+    "category": "India",
+    "amount": "995",
+    "user": "safar",
+    "status": "active"
   }
 ]
