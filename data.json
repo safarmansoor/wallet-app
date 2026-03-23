@@ -1252,5 +1252,16 @@
     "amount": "13",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774266902334,
+    "createdAt": "2026-03-23T11:55:02.334Z",
+    "date": "2026-03-23",
+    "type": "income",
+    "desc": "Tips",
+    "category": "Salary",
+    "amount": "500",
+    "user": "renu",
+    "status": "active"
   }
 ]
