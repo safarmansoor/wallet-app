@@ -1329,5 +1329,16 @@
     "amount": "651.5",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1774379103402,
+    "createdAt": "2026-03-24T19:05:03.402Z",
+    "date": "2026-03-24",
+    "type": "expense",
+    "desc": "Inside Baku Azerbaijan Expenses",
+    "category": "Travel",
+    "amount": "651.50",
+    "user": "safar",
+    "status": "active"
   }
 ]
