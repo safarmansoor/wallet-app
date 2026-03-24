@@ -1263,5 +1263,16 @@
     "amount": "500",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1774327507564,
+    "createdAt": "2026-03-24T04:45:07.564Z",
+    "date": "2026-03-23",
+    "type": "expense",
+    "desc": "Tomato onion rice container yoghurt eggs lemon conditioner",
+    "category": "Food",
+    "amount": "82",
+    "user": "safar",
+    "status": "active"
   }
 ]
