@@ -1285,5 +1285,16 @@
     "amount": "370",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774376142793,
+    "createdAt": "2026-03-24T18:15:42.793Z",
+    "date": "2026-03-24",
+    "type": "expense",
+    "desc": "Potato TomatoPaste Porota",
+    "category": "Food",
+    "amount": "8.59",
+    "user": "safar",
+    "status": "active"
   }
 ]
