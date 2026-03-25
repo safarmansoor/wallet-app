@@ -936,83 +936,105 @@ function filterTransactionsByDate(transactions, fromDate, toDate) {
     });
 }
 
-// Get selected expenses from checkboxes
-function getSelectedExpenses() {
-    const checkboxes = document.querySelectorAll('#expenses-table-body input[type="checkbox"]');
-    const selectedIds = [];
+// Get selected categories from checkboxes
+function getSelectedCategories() {
+    const checkboxes = document.querySelectorAll('#categories-table-body input[type="checkbox"]');
+    const selectedCategories = [];
     
     checkboxes.forEach(checkbox => {
         if (checkbox.checked) {
-            selectedIds.push(checkbox.value);
+            selectedCategories.push(checkbox.value);
         }
     });
     
-    return selectedIds;
+    return selectedCategories;
 }
 
-// Update expenses table with filtered transactions
-function updateExpensesTable(filteredTransactions) {
-    const tbody = document.getElementById('expenses-table-body');
-    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+// Update categories table with filtered transactions
+function updateCategoriesTable(filteredTransactions) {
+    const tbody = document.getElementById('categories-table-body');
+    const selectAllCheckbox = document.getElementById('select-all-categories-checkbox');
     
     // Clear existing rows
     tbody.innerHTML = '';
     
-    // Filter to only show expenses
+    // Filter to only show expenses and group by category
     const expenseTransactions = filteredTransactions.filter(t => t.type === 'expense');
     
     if (expenseTransactions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="padding: 15px; text-align: center; color: #666;">No expenses found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="padding: 15px; text-align: center; color: #666;">No expenses found</td></tr>';
         selectAllCheckbox.disabled = true;
-        updateExpensesFilterStatus(0, 0);
+        updateCategoriesFilterStatus(0, 0);
         return;
     }
     
     selectAllCheckbox.disabled = false;
     
-    // Sort by date (newest first)
-    expenseTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    // Calculate category totals
+    const categoryTotals = {};
+    const categoryCounts = {};
+    
+    expenseTransactions.forEach(t => {
+        const cat = (t.category || '').trim() || 'Uncategorized';
+        const amt = parseFloat(t.amount);
+        
+        if (!categoryTotals[cat]) {
+            categoryTotals[cat] = 0;
+            categoryCounts[cat] = 0;
+        }
+        
+        categoryTotals[cat] += amt;
+        categoryCounts[cat]++;
+    });
+    
+    // Sort categories by total amount (highest first)
+    const sortedCategories = Object.entries(categoryTotals).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
     
     let totalSelected = 0;
     
-    expenseTransactions.forEach((t, index) => {
+    sortedCategories.forEach(([cat, total]) => {
         const row = document.createElement('tr');
-        row.style.backgroundColor = index % 2 === 0 ? '#f8f9fa' : 'white';
+        row.style.backgroundColor = sortedCategories.indexOf([cat, total]) % 2 === 0 ? '#f8f9fa' : 'white';
         row.style.borderBottom = '1px solid #dee2e6';
         
-        const formattedDate = t.date ? formatDate(t.date) : 'No Date';
-        const formattedAmount = formatAmount(parseFloat(t.amount || 0));
+        const formattedAmount = formatAmount(total);
+        const count = categoryCounts[cat];
         
         row.innerHTML = `
             <td style="padding: 8px; text-align: center;">
-                <input type="checkbox" value="${t.id}" onchange="updateCategoryFromTable()">
+                <input type="checkbox" value="${cat}" onchange="updateCategoryFromTable()">
             </td>
-            <td style="padding: 8px;">${formattedDate}</td>
-            <td style="padding: 8px;"><span style="background: #e9ecef; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${t.category || 'Uncategorized'}</span></td>
-            <td style="padding: 8px;">${t.desc || '—'}</td>
+            <td style="padding: 8px;">
+                <span style="background: #e9ecef; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${cat}</span>
+            </td>
             <td style="padding: 8px; text-align: right; color: #dc3545;">-${formattedAmount} AED</td>
+            <td style="padding: 8px; text-align: right; color: #6c757d;">${count} transaction${count > 1 ? 's' : ''}</td>
         `;
         
         tbody.appendChild(row);
         
-        // Check if this expense should be selected by default (all selected initially)
+        // Check if this category should be selected by default (all selected initially)
         const checkbox = row.querySelector('input[type="checkbox"]');
         checkbox.checked = true;
         totalSelected++;
     });
     
-    updateExpensesFilterStatus(expenseTransactions.length, totalSelected);
+    updateCategoriesFilterStatus(sortedCategories.length, totalSelected);
 }
 
 // Update category list with filtered data
-function updateCategoryListWithFilters(filteredTransactions, selectedExpenseIds) {
+function updateCategoryListWithFilters(filteredTransactions, selectedCategories) {
     const cl = document.getElementById('category-list');
     cl.innerHTML = '';
     
-    // Filter transactions by selected expense IDs if any are selected
+    // Filter transactions by selected categories if any are selected
     let finalTransactions = filteredTransactions;
-    if (selectedExpenseIds && selectedExpenseIds.length > 0) {
-        finalTransactions = filteredTransactions.filter(t => selectedExpenseIds.includes(t.id));
+    if (selectedCategories && selectedCategories.length > 0) {
+        finalTransactions = filteredTransactions.filter(t => {
+            if (t.type !== 'expense') return false;
+            const cat = (t.category || '').trim() || 'Uncategorized';
+            return selectedCategories.includes(cat);
+        });
     }
     
     // Calculate category totals
@@ -1064,18 +1086,18 @@ function updateDateFilterStatus() {
     }
 }
 
-// Update expenses filter status display
-function updateExpensesFilterStatus(totalExpenses, selectedExpenses) {
-    const statusDiv = document.getElementById('expenses-filter-status');
+// Update categories filter status display
+function updateCategoriesFilterStatus(totalCategories, selectedCategories) {
+    const statusDiv = document.getElementById('categories-filter-status');
     
-    if (totalExpenses === 0) {
-        statusDiv.innerText = 'No expenses to filter';
+    if (totalCategories === 0) {
+        statusDiv.innerText = 'No categories to filter';
         statusDiv.style.color = '#6c757d';
-    } else if (selectedExpenses === totalExpenses) {
-        statusDiv.innerText = `All ${totalExpenses} expenses selected`;
+    } else if (selectedCategories === totalCategories) {
+        statusDiv.innerText = `All ${totalCategories} categories selected`;
         statusDiv.style.color = '#28a745';
     } else {
-        statusDiv.innerText = `${selectedExpenses} of ${totalExpenses} expenses selected`;
+        statusDiv.innerText = `${selectedCategories} of ${totalCategories} categories selected`;
         statusDiv.style.color = '#ffc107';
     }
 }
@@ -1088,35 +1110,35 @@ function clearDateFilter() {
     debouncedUpdateUI();
 }
 
-// Select all expenses
-function selectAllExpenses() {
-    const checkboxes = document.querySelectorAll('#expenses-table-body input[type="checkbox"]');
+// Select all categories
+function selectAllCategories() {
+    const checkboxes = document.querySelectorAll('#categories-table-body input[type="checkbox"]');
     checkboxes.forEach(cb => cb.checked = true);
-    updateExpensesFilterStatus(checkboxes.length, checkboxes.length);
+    updateCategoriesFilterStatus(checkboxes.length, checkboxes.length);
     updateCategoryFromTable();
 }
 
-// Clear all expenses
-function clearAllExpenses() {
-    const checkboxes = document.querySelectorAll('#expenses-table-body input[type="checkbox"]');
+// Clear all categories
+function clearAllCategories() {
+    const checkboxes = document.querySelectorAll('#categories-table-body input[type="checkbox"]');
     checkboxes.forEach(cb => cb.checked = false);
-    updateExpensesFilterStatus(checkboxes.length, 0);
+    updateCategoriesFilterStatus(checkboxes.length, 0);
     updateCategoryFromTable();
 }
 
-// Toggle select all checkbox
-function toggleSelectAll(checkbox) {
-    const allCheckboxes = document.querySelectorAll('#expenses-table-body input[type="checkbox"]');
+// Toggle select all categories checkbox
+function toggleSelectAllCategories(checkbox) {
+    const allCheckboxes = document.querySelectorAll('#categories-table-body input[type="checkbox"]');
     allCheckboxes.forEach(cb => cb.checked = checkbox.checked);
     
     const selectedCount = checkbox.checked ? allCheckboxes.length : 0;
-    updateExpensesFilterStatus(allCheckboxes.length, selectedCount);
+    updateCategoriesFilterStatus(allCheckboxes.length, selectedCount);
     updateCategoryFromTable();
 }
 
 // Update category calculation when table selections change
 function updateCategoryFromTable() {
-    const selectedIds = getSelectedExpenses();
+    const selectedCategories = getSelectedCategories();
     const fromDate = document.getElementById('filter-date-from').value;
     const toDate = document.getElementById('filter-date-to').value;
     
@@ -1125,8 +1147,8 @@ function updateCategoryFromTable() {
     const allTransactions = transactions.filter(t => (t.user || 'renu') === trackUser && (t.status || 'active') !== 'cancelled');
     const filteredByDate = filterTransactionsByDate(allTransactions, fromDate, toDate);
     
-    // Update category list with selected expenses
-    updateCategoryListWithFilters(filteredByDate, selectedIds);
+    // Update category list with selected categories
+    updateCategoryListWithFilters(filteredByDate, selectedCategories);
 }
 
 async function updateUI() {
@@ -1164,19 +1186,19 @@ async function updateUI() {
         const balance = inc - exp;
         document.getElementById('total-balance').innerText = balance < 0 ? `-${formatAmount(Math.abs(balance))} AED` : `${formatAmount(balance)} AED`;
         document.getElementById('balance-card').classList.toggle('negative', balance < 0);
-        // Update expenses table and category list with filtering
-        updateExpensesTable(filtered);
+        // Update categories table and category list with filtering
+        updateCategoriesTable(filtered);
         
         // Get current filter values
         const fromDate = document.getElementById('filter-date-from').value;
         const toDate = document.getElementById('filter-date-to').value;
-        const selectedIds = getSelectedExpenses();
+        const selectedCategories = getSelectedCategories();
         
         // Apply date filtering
         const filteredByDate = filterTransactionsByDate(filtered, fromDate, toDate);
         
         // Update category list with filters
-        updateCategoryListWithFilters(filteredByDate, selectedIds);
+        updateCategoryListWithFilters(filteredByDate, selectedCategories);
 
         // By Month - Enhanced protection against duplicates
         const monthTotals = {};

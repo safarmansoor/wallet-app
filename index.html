@@ -110,34 +110,33 @@
                 <div id="date-filter-status" style="font-size: 0.8rem; color: #6c757d; margin-left: 5px;"></div>
             </div>
             
-            <!-- Expenses Table with Checkboxes -->
-            <div class="expenses-table-section" style="margin-bottom: 15px;">
+            <!-- Categories Table with Checkboxes -->
+            <div class="categories-table-section" style="margin-bottom: 15px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <label style="font-size: 0.9rem; font-weight: bold; color: #495057;">Select Specific Expenses:</label>
+                    <label style="font-size: 0.9rem; font-weight: bold; color: #495057;">Select Categories to Include:</label>
                     <div style="display: flex; gap: 5px;">
-                        <button onclick="selectAllExpenses()" style="padding: 4px 8px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Select All</button>
-                        <button onclick="clearAllExpenses()" style="padding: 4px 8px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Clear All</button>
+                        <button onclick="selectAllCategories()" style="padding: 4px 8px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Select All</button>
+                        <button onclick="clearAllCategories()" style="padding: 4px 8px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Clear All</button>
                     </div>
                 </div>
-                <div id="expenses-table-container" style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 4px;">
-                    <table id="expenses-table" class="expenses-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <div id="categories-table-container" style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 4px;">
+                    <table id="categories-table" class="categories-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
                         <thead style="background: #e9ecef; position: sticky; top: 0; z-index: 1;">
                             <tr>
                                 <th style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6; width: 40px;">
-                                    <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this)">
+                                    <input type="checkbox" id="select-all-categories-checkbox" onchange="toggleSelectAllCategories(this)">
                                 </th>
-                                <th style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;">Date</th>
                                 <th style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;">Category</th>
-                                <th style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;">Description</th>
-                                <th style="padding: 8px; text-align: right; border-bottom: 2px solid #dee2e6;">Amount</th>
+                                <th style="padding: 8px; text-align: right; border-bottom: 2px solid #dee2e6;">Total Amount</th>
+                                <th style="padding: 8px; text-align: right; border-bottom: 2px solid #dee2e6;">Transaction Count</th>
                             </tr>
                         </thead>
-                        <tbody id="expenses-table-body">
-                            <!-- Expenses will be populated here -->
+                        <tbody id="categories-table-body">
+                            <!-- Categories will be populated here -->
                         </tbody>
                     </table>
                 </div>
-                <div id="expenses-filter-status" style="font-size: 0.8rem; color: #6c757d; margin-top: 5px; margin-left: 5px;"></div>
+                <div id="categories-filter-status" style="font-size: 0.8rem; color: #6c757d; margin-top: 5px; margin-left: 5px;"></div>
             </div>
             
             <div id="category-list"></div>
