@@ -705,7 +705,10 @@ function updateUI() {
         const cat = (t.category || '').trim() || 'Uncategorized';
         const amt = parseFloat(t.amount);
         if (!categoryTotals[cat]) categoryTotals[cat] = 0;
-        categoryTotals[cat] += (t.type === 'asset' || t.type === 'income') ? amt : -amt;
+        // Only calculate expenses for reports
+        if (t.type === 'expense') {
+            categoryTotals[cat] += amt;
+        }
     });
     const cl = document.getElementById('category-list');
     cl.innerHTML = '';
@@ -723,7 +726,10 @@ function updateUI() {
         const month = t.date ? t.date.substring(0, 7) : 'Unknown';
         const amt = parseFloat(t.amount);
         if (!monthTotals[month]) monthTotals[month] = 0;
-        monthTotals[month] += (t.type === 'asset' || t.type === 'income') ? amt : -amt;
+        // Only calculate expenses for reports
+        if (t.type === 'expense') {
+            monthTotals[month] += amt;
+        }
     });
     const ml = document.getElementById('month-list');
     ml.innerHTML = '';
