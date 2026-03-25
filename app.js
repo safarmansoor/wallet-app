@@ -936,6 +936,149 @@ function filterTransactionsByDate(transactions, fromDate, toDate) {
     });
 }
 
+// Year/Month filtering helper function
+function filterTransactionsByYearMonth(transactions, selectedYear, selectedMonths) {
+    if (!selectedYear || !selectedMonths || selectedMonths.length === 0) {
+        return transactions;
+    }
+    
+    return transactions.filter(t => {
+        if (!t.date) return false;
+        const transactionDate = new Date(t.date);
+        const transactionYear = transactionDate.getFullYear();
+        const transactionMonth = transactionDate.getMonth() + 1; // 1-12
+        
+        return transactionYear === selectedYear && selectedMonths.includes(transactionMonth);
+    });
+}
+
+// Combined filtering function that handles both date range and year/month filters
+function filterTransactionsCombined(transactions, fromDate, toDate, selectedYear, selectedMonths) {
+    // Filter by date range first
+    let filteredByDate = filterTransactionsByDate(transactions, fromDate, toDate);
+    
+    // Filter by year/month
+    let filteredByYearMonth = filterTransactionsByYearMonth(transactions, selectedYear, selectedMonths);
+    
+    // Combine results using OR logic (union of both filters)
+    if (fromDate || toDate) {
+        if (selectedYear && selectedMonths && selectedMonths.length > 0) {
+            // Both filters active - combine results
+            const combinedIds = new Set([
+                ...filteredByDate.map(t => t.id),
+                ...filteredByYearMonth.map(t => t.id)
+            ]);
+            return transactions.filter(t => combinedIds.has(t.id));
+        } else {
+            // Only date range filter active
+            return filteredByDate;
+        }
+    } else if (selectedYear && selectedMonths && selectedMonths.length > 0) {
+        // Only year/month filter active
+        return filteredByYearMonth;
+    }
+    
+    // No filters active
+    return transactions;
+}
+
+// Initialize year dropdown with years from 2020 to current year + 1
+function populateYearDropdown() {
+    const yearSelect = document.getElementById('filter-year');
+    const currentYear = new Date().getFullYear();
+    
+    // Clear existing options
+    yearSelect.innerHTML = '';
+    
+    // Add years from 2020 to current year + 1
+    for (let year = 2020; year <= currentYear + 1; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearSelect.appendChild(option);
+    }
+    
+    // Set default to current year
+    yearSelect.value = currentYear;
+}
+
+// Create month buttons (Jan through Dec)
+function createMonthButtons() {
+    const container = document.getElementById('month-buttons-container');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    container.innerHTML = '';
+    
+    months.forEach((month, index) => {
+        const button = document.createElement('button');
+        button.className = 'month-btn';
+        button.textContent = month;
+        button.onclick = () => toggleMonthSelection(index + 1, month);
+        container.appendChild(button);
+    });
+}
+
+// Toggle month selection
+function toggleMonthSelection(monthNumber, monthName) {
+    const button = event.target;
+    const selectedMonths = getSelectedMonths();
+    
+    if (selectedMonths.includes(monthNumber)) {
+        // Remove month from selection
+        const index = selectedMonths.indexOf(monthNumber);
+        selectedMonths.splice(index, 1);
+        button.classList.remove('selected');
+    } else {
+        // Add month to selection
+        selectedMonths.push(monthNumber);
+        button.classList.add('selected');
+    }
+    
+    // Update status display
+    updateYearMonthFilterStatus();
+    
+    // Update UI with new filtering
+    debouncedUpdateUI();
+}
+
+// Get currently selected months
+function getSelectedMonths() {
+    const buttons = document.querySelectorAll('.month-btn.selected');
+    return Array.from(buttons).map(btn => {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return months.indexOf(btn.textContent) + 1;
+    });
+}
+
+// Update year/month filter status display
+function updateYearMonthFilterStatus() {
+    const yearSelect = document.getElementById('filter-year');
+    const selectedMonths = getSelectedMonths();
+    const statusDiv = document.getElementById('year-month-filter-status');
+    
+    const selectedYear = yearSelect.value;
+    
+    if (!selectedYear || selectedMonths.length === 0) {
+        statusDiv.innerText = 'Showing all expenses';
+        statusDiv.style.color = '#6c757d';
+    } else {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const selectedMonthNames = selectedMonths.map(m => months[m - 1]).join(', ');
+        statusDiv.innerText = `Filtering by: ${selectedYear} - ${selectedMonthNames}`;
+        statusDiv.style.color = '#28a745';
+    }
+}
+
+// Clear year/month filter
+function clearYearMonthFilter() {
+    const buttons = document.querySelectorAll('.month-btn');
+    buttons.forEach(btn => btn.classList.remove('selected'));
+    const yearSelect = document.getElementById('filter-year');
+    yearSelect.value = new Date().getFullYear();
+    updateYearMonthFilterStatus();
+    debouncedUpdateUI();
+}
+
 // Get selected categories from checkboxes
 function getSelectedCategories() {
     const checkboxes = document.querySelectorAll('#categories-table-body input[type="checkbox"]');
@@ -1186,19 +1329,22 @@ async function updateUI() {
         const balance = inc - exp;
         document.getElementById('total-balance').innerText = balance < 0 ? `-${formatAmount(Math.abs(balance))} AED` : `${formatAmount(balance)} AED`;
         document.getElementById('balance-card').classList.toggle('negative', balance < 0);
-        // Update categories table and category list with filtering
-        updateCategoriesTable(filtered);
         
         // Get current filter values
         const fromDate = document.getElementById('filter-date-from').value;
         const toDate = document.getElementById('filter-date-to').value;
+        const selectedYear = document.getElementById('filter-year').value;
+        const selectedMonths = getSelectedMonths();
         const selectedCategories = getSelectedCategories();
         
-        // Apply date filtering
-        const filteredByDate = filterTransactionsByDate(filtered, fromDate, toDate);
+        // Apply combined filtering (date range OR year/month)
+        const filteredByDateAndYearMonth = filterTransactionsCombined(filtered, fromDate, toDate, selectedYear, selectedMonths);
+        
+        // Update categories table and category list with filtering
+        updateCategoriesTable(filteredByDateAndYearMonth);
         
         // Update category list with filters
-        updateCategoryListWithFilters(filteredByDate, selectedCategories);
+        updateCategoryListWithFilters(filteredByDateAndYearMonth, selectedCategories);
 
         // By Month - Enhanced protection against duplicates
         const monthTotals = {};
@@ -1551,6 +1697,11 @@ function exportData() {
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize year dropdown and month buttons
+    populateYearDropdown();
+    createMonthButtons();
+    updateYearMonthFilterStatus();
+    
     // Add event listeners for date filtering
     const fromDateInput = document.getElementById('filter-date-from');
     const toDateInput = document.getElementById('filter-date-to');

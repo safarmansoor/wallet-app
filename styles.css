@@ -674,3 +674,58 @@ button:disabled {
     color: #2A231D;
     margin-left: auto;
 }
+
+/* Year/Month Filter Styles */
+.month-btn {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #495057;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.month-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.month-btn.selected {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.month-btn.selected:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+}
+
+/* Responsive design for month buttons */
+@media (max-width: 768px) {
+    .month-btn {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+    }
+    
+    #month-buttons-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    #month-buttons-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 360px) {
+    #month-buttons-container {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}

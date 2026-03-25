@@ -110,6 +110,24 @@
                 <div id="date-filter-status" style="font-size: 0.8rem; color: #6c757d; margin-left: 5px;"></div>
             </div>
             
+            <!-- Year and Month Filter (OR to Date Range) -->
+            <div class="year-month-filter-section" style="margin-bottom: 15px; padding: 10px; background: #e9ecef; border-radius: 8px; border: 1px solid #dee2e6;">
+                <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
+                    <label style="font-size: 0.9rem; font-weight: bold; color: #495057;">OR Filter by Year/Month:</label>
+                    <select id="filter-year" style="padding: 5px; border: 1px solid #ced4da; border-radius: 4px; min-width: 120px;">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                    <span style="color: #6c757d; font-size: 0.8rem;">Select Month:</span>
+                </div>
+                
+                <!-- Month Buttons Grid -->
+                <div id="month-buttons-container" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 10px;">
+                    <!-- 12 month buttons will be generated here -->
+                </div>
+                
+                <div id="year-month-filter-status" style="font-size: 0.8rem; color: #6c757d; margin-left: 5px;"></div>
+            </div>
+            
             <!-- Categories Table with Checkboxes -->
             <div class="categories-table-section" style="margin-bottom: 15px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
