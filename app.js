@@ -322,6 +322,8 @@ const githubData = {
 };
 
 let transactions = [];
+let isUpdatingUI = false;
+let updateUITimer = null;
 
 // Default users with PINs
 const DEFAULT_USERS = { safar: 'safar1997', renu: 'renu' };
@@ -628,7 +630,7 @@ async function showApp() {
 window.switchTrackUser = function() {
     if (!isAdmin()) return;
     setTrackUser(document.getElementById('user-select').value);
-    updateUI();
+    debouncedUpdateUI();
 }
 
 const getSetting = (key) => localStorage.getItem(key);
@@ -661,7 +663,7 @@ window.savePermissions = function() {
     document.getElementById('main-content').style.display = canView ? 'block' : 'none';
     document.getElementById('no-permission-msg').style.display = canView ? 'none' : 'block';
     togglePermissions();
-    updateUI();
+    debouncedUpdateUI();
 }
 
 window.toggleSettings = function() {
@@ -889,124 +891,152 @@ async function saveToGitHub() {
 }
 
 
-async function updateUI() {
-    const trackUser = getTrackUser();
-    // Filter transactions by user and exclude cancelled ones from main view
-    const filtered = transactions.filter(t => (t.user || 'renu') === trackUser && (t.status || 'active') !== 'cancelled');
-    document.getElementById('history-list').innerHTML = '';
-    let asset = 0, inc = 0, exp = 0;
-    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-    const canDelete = getPerm(getCurrentUser(), 'delete');
-    filtered.forEach((t, i) => {
-        const amt = parseFloat(t.amount);
-        if(t.type === 'asset') asset += amt; else if(t.type === 'income') inc += amt; else exp += amt;
-        const typeClass = t.type === 'asset' ? 'asset' : (t.type === 'income' ? 'inc' : 'exp');
-        const sign = (t.type === 'asset' || t.type === 'income') ? '+' : '-';
-        const globalIdx = transactions.findIndex(x => x.id === t.id);
-        const delBtn = canDelete ? `<span class="del-btn" onclick="removeTransaction(${globalIdx})">&times;</span>` : '';
-        const item = document.createElement('div');
-        item.className = 'transaction';
-        item.innerHTML = `<div class="t-left"><div class="t-desc">${t.desc || '—'}</div><div class="t-meta"><span>${t.date ? formatDate(t.date) : 'No Date'}</span><span class="t-tag">${t.category || 'Uncategorized'}</span></div></div><div class="t-right"><span class="t-amount ${typeClass}">${sign}${formatAmount(amt)} AED</span>${delBtn}</div>`;
-        document.getElementById('history-list').appendChild(item);
-    });
-    document.getElementById('total-asset').innerText = `${formatAmount(asset)} AED`;
-    document.getElementById('total-inc').innerText = `${formatAmount(inc)} AED`;
-    document.getElementById('total-exp').innerText = `${formatAmount(exp)} AED`;
-    const balance = inc - exp;
-    document.getElementById('total-balance').innerText = balance < 0 ? `-${formatAmount(Math.abs(balance))} AED` : `${formatAmount(balance)} AED`;
-    document.getElementById('balance-card').classList.toggle('negative', balance < 0);
-    const categoryTotals = {};
-    filtered.forEach(t => {
-        const cat = (t.category || '').trim() || 'Uncategorized';
-        const amt = parseFloat(t.amount);
-        if (!categoryTotals[cat]) categoryTotals[cat] = 0;
-        // Only calculate expenses for reports
-        if (t.type === 'expense') {
-            categoryTotals[cat] += amt;
-        }
-    });
-    const cl = document.getElementById('category-list');
-    cl.innerHTML = '';
-    Object.entries(categoryTotals).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).forEach(([cat, total]) => {
-        const it = document.createElement('div');
-        it.className = 'category-item';
-        // Since we only show expenses in reports, always display as negative
-        it.innerHTML = `<span>${cat}</span><span class="cat-amount negative">-${formatAmount(total)} AED</span>`;
-        cl.appendChild(it);
-    });
-
-    // By Month
-    const monthTotals = {};
-    filtered.forEach(t => {
-        const month = t.date ? t.date.substring(0, 7) : 'Unknown';
-        const amt = parseFloat(t.amount);
-        if (!monthTotals[month]) monthTotals[month] = 0;
-        // Only calculate expenses for reports
-        if (t.type === 'expense') {
-            monthTotals[month] += amt;
-        }
-    });
-    const ml = document.getElementById('month-list');
-    
-    // Clear existing month cards to prevent duplicates
-    ml.innerHTML = '';
-    
-    // Process month cards with async budget loading
-    const monthEntries = Object.entries(monthTotals).sort((a, b) => b[0].localeCompare(a[0]));
-    
-    // Create all month cards first, then append them at once to prevent partial rendering
-    const monthCards = [];
-    for (const [month, total] of monthEntries) {
-        const it = document.createElement('div');
-        it.className = 'month-card';
-        const [y, m] = month.split('-');
-        const monthName = new Date(y, m - 1).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-        
-        // Get budget for this month
-        const budget = await budgetData.getBudget(month);
-        const savings = budget - total;
-        const isOverBudget = savings < 0;
-        
-        // Create budget and savings display
-        let budgetHtml = '';
-        if (budget > 0) {
-            budgetHtml = `
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
-                    <span style="color: #666;">Budget:</span>
-                    <span style="font-weight: bold;">${formatAmount(budget)} AED</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
-                    <span style="color: #666;">Expenses:</span>
-                    <span style="font-weight: bold; color: #dc3545;">-${formatAmount(total)} AED</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 5px;">
-                    <span style="color: #666;">Savings:</span>
-                    <span style="font-weight: bold; color: ${isOverBudget ? '#dc3545' : '#28a745'};">${isOverBudget ? '-' : '+'}${formatAmount(Math.abs(savings))} AED</span>
-                </div>
-            `;
-        } else {
-            budgetHtml = `
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
-                    <span style="color: #666;">Budget:</span>
-                    <span style="font-weight: bold; color: #999;">Not Set</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
-                    <span style="color: #666;">Expenses:</span>
-                    <span style="font-weight: bold; color: #dc3545;">-${formatAmount(total)} AED</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 5px;">
-                    <span style="color: #666;">Savings:</span>
-                    <span style="font-weight: bold; color: #999;">N/A</span>
-                </div>
-            `;
-        }
-        
-        it.innerHTML = `<h3>${monthName}</h3>${budgetHtml}`;
-        monthCards.push(it);
+// Debounced updateUI function to prevent multiple rapid calls
+function debouncedUpdateUI() {
+    // Clear any existing timer
+    if (updateUITimer) {
+        clearTimeout(updateUITimer);
     }
     
-    // Append all month cards at once to prevent duplicate rendering
-    monthCards.forEach(card => ml.appendChild(card));
+    // Set a new timer to call updateUI after 100ms
+    updateUITimer = setTimeout(() => {
+        updateUI();
+    }, 100);
+}
+
+async function updateUI() {
+    // Prevent multiple simultaneous executions
+    if (isUpdatingUI) {
+        console.log('updateUI already running, skipping duplicate call');
+        return;
+    }
+    
+    isUpdatingUI = true;
+    
+    try {
+        const trackUser = getTrackUser();
+        // Filter transactions by user and exclude cancelled ones from main view
+        const filtered = transactions.filter(t => (t.user || 'renu') === trackUser && (t.status || 'active') !== 'cancelled');
+        document.getElementById('history-list').innerHTML = '';
+        let asset = 0, inc = 0, exp = 0;
+        filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const canDelete = getPerm(getCurrentUser(), 'delete');
+        filtered.forEach((t, i) => {
+            const amt = parseFloat(t.amount);
+            if(t.type === 'asset') asset += amt; else if(t.type === 'income') inc += amt; else exp += amt;
+            const typeClass = t.type === 'asset' ? 'asset' : (t.type === 'income' ? 'inc' : 'exp');
+            const sign = (t.type === 'asset' || t.type === 'income') ? '+' : '-';
+            const globalIdx = transactions.findIndex(x => x.id === t.id);
+            const delBtn = canDelete ? `<span class="del-btn" onclick="removeTransaction(${globalIdx})">&times;</span>` : '';
+            const item = document.createElement('div');
+            item.className = 'transaction';
+            item.innerHTML = `<div class="t-left"><div class="t-desc">${t.desc || '—'}</div><div class="t-meta"><span>${t.date ? formatDate(t.date) : 'No Date'}</span><span class="t-tag">${t.category || 'Uncategorized'}</span></div></div><div class="t-right"><span class="t-amount ${typeClass}">${sign}${formatAmount(amt)} AED</span>${delBtn}</div>`;
+            document.getElementById('history-list').appendChild(item);
+        });
+        document.getElementById('total-asset').innerText = `${formatAmount(asset)} AED`;
+        document.getElementById('total-inc').innerText = `${formatAmount(inc)} AED`;
+        document.getElementById('total-exp').innerText = `${formatAmount(exp)} AED`;
+        const balance = inc - exp;
+        document.getElementById('total-balance').innerText = balance < 0 ? `-${formatAmount(Math.abs(balance))} AED` : `${formatAmount(balance)} AED`;
+        document.getElementById('balance-card').classList.toggle('negative', balance < 0);
+        const categoryTotals = {};
+        filtered.forEach(t => {
+            const cat = (t.category || '').trim() || 'Uncategorized';
+            const amt = parseFloat(t.amount);
+            if (!categoryTotals[cat]) categoryTotals[cat] = 0;
+            // Only calculate expenses for reports
+            if (t.type === 'expense') {
+                categoryTotals[cat] += amt;
+            }
+        });
+        const cl = document.getElementById('category-list');
+        cl.innerHTML = '';
+        Object.entries(categoryTotals).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).forEach(([cat, total]) => {
+            const it = document.createElement('div');
+            it.className = 'category-item';
+            // Since we only show expenses in reports, always display as negative
+            it.innerHTML = `<span>${cat}</span><span class="cat-amount negative">-${formatAmount(total)} AED</span>`;
+            cl.appendChild(it);
+        });
+
+        // By Month - Enhanced protection against duplicates
+        const monthTotals = {};
+        filtered.forEach(t => {
+            const month = t.date ? t.date.substring(0, 7) : 'Unknown';
+            const amt = parseFloat(t.amount);
+            if (!monthTotals[month]) monthTotals[month] = 0;
+            // Only calculate expenses for reports
+            if (t.type === 'expense') {
+                monthTotals[month] += amt;
+            }
+        });
+        const ml = document.getElementById('month-list');
+        
+        // Clear existing month cards to prevent duplicates
+        ml.innerHTML = '';
+        
+        // Process month cards with async budget loading
+        const monthEntries = Object.entries(monthTotals).sort((a, b) => b[0].localeCompare(a[0]));
+        
+        // Create all month cards first, then append them at once to prevent partial rendering
+        const monthCards = [];
+        for (const [month, total] of monthEntries) {
+            const it = document.createElement('div');
+            it.className = 'month-card';
+            const [y, m] = month.split('-');
+            const monthName = new Date(y, m - 1).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+            
+            // Get budget for this month
+            const budget = await budgetData.getBudget(month);
+            const savings = budget - total;
+            const isOverBudget = savings < 0;
+            
+            // Create budget and savings display
+            let budgetHtml = '';
+            if (budget > 0) {
+                budgetHtml = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
+                        <span style="color: #666;">Budget:</span>
+                        <span style="font-weight: bold;">${formatAmount(budget)} AED</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
+                        <span style="color: #666;">Expenses:</span>
+                        <span style="font-weight: bold; color: #dc3545;">-${formatAmount(total)} AED</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 5px;">
+                        <span style="color: #666;">Savings:</span>
+                        <span style="font-weight: bold; color: ${isOverBudget ? '#dc3545' : '#28a745'};">${isOverBudget ? '-' : '+'}${formatAmount(Math.abs(savings))} AED</span>
+                    </div>
+                `;
+            } else {
+                budgetHtml = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
+                        <span style="color: #666;">Budget:</span>
+                        <span style="font-weight: bold; color: #999;">Not Set</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
+                        <span style="color: #666;">Expenses:</span>
+                        <span style="font-weight: bold; color: #dc3545;">-${formatAmount(total)} AED</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 5px;">
+                        <span style="color: #666;">Savings:</span>
+                        <span style="font-weight: bold; color: #999;">N/A</span>
+                    </div>
+                `;
+            }
+            
+            it.innerHTML = `<h3>${monthName}</h3>${budgetHtml}`;
+            monthCards.push(it);
+        }
+        
+        // Append all month cards at once to prevent duplicate rendering
+        monthCards.forEach(card => ml.appendChild(card));
+    } catch (error) {
+        console.error('Error in updateUI:', error);
+    } finally {
+        // Always reset the flag when done
+        isUpdatingUI = false;
+    }
 }
 
 function removeTransaction(idx) {
