@@ -1337,14 +1337,18 @@ function updateCategoryFromTable() {
     const selectedCategories = getSelectedCategories();
     const fromDate = document.getElementById('filter-date-from').value;
     const toDate = document.getElementById('filter-date-to').value;
+    const selectedYear = document.getElementById('filter-year').value;
+    const selectedMonths = getSelectedMonths();
     
-    // Get current filtered transactions
+    // Get current filtered transactions - this includes ALL current filters
     const trackUser = getTrackUser();
     const allTransactions = transactions.filter(t => (t.user || 'renu') === trackUser && (t.status || 'active') !== 'cancelled');
-    const filteredByDate = filterTransactionsByDate(allTransactions, fromDate, toDate);
     
-    // Update category list with selected categories
-    updateCategoryListWithFilters(filteredByDate, selectedCategories);
+    // Apply combined filtering (date range OR year/month) - same as in updateUI
+    const filteredByDateAndYearMonth = filterTransactionsCombined(allTransactions, fromDate, toDate, selectedYear, selectedMonths);
+    
+    // Update category list with selected categories applied on top of existing filters
+    updateCategoryListWithFilters(filteredByDateAndYearMonth, selectedCategories);
 }
 
 async function updateUI() {
