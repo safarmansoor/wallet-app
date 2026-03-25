@@ -947,10 +947,15 @@ async function updateUI() {
         }
     });
     const ml = document.getElementById('month-list');
+    
+    // Clear existing month cards to prevent duplicates
     ml.innerHTML = '';
     
     // Process month cards with async budget loading
     const monthEntries = Object.entries(monthTotals).sort((a, b) => b[0].localeCompare(a[0]));
+    
+    // Create all month cards first, then append them at once to prevent partial rendering
+    const monthCards = [];
     for (const [month, total] of monthEntries) {
         const it = document.createElement('div');
         it.className = 'month-card';
@@ -997,8 +1002,11 @@ async function updateUI() {
         }
         
         it.innerHTML = `<h3>${monthName}</h3>${budgetHtml}`;
-        ml.appendChild(it);
+        monthCards.push(it);
     }
+    
+    // Append all month cards at once to prevent duplicate rendering
+    monthCards.forEach(card => ml.appendChild(card));
 }
 
 function removeTransaction(idx) {
