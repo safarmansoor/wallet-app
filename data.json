@@ -1340,5 +1340,16 @@
     "amount": "651.50",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774443824070,
+    "createdAt": "2026-03-25T13:03:44.070Z",
+    "date": "2026-03-25",
+    "type": "expense",
+    "desc": "Father expenses (gift)",
+    "category": "India",
+    "amount": "392",
+    "user": "safar",
+    "status": "active"
   }
 ]
