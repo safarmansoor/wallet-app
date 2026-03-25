@@ -555,7 +555,7 @@
     "date": "2026-02-13",
     "type": "expense",
     "desc": "Car wash tips",
-    "category": "Car",
+    "category": "Car Wash",
     "amount": "5",
     "user": "safar",
     "status": "active"
@@ -610,7 +610,7 @@
     "date": "2026-02-15",
     "type": "expense",
     "desc": "Petrol",
-    "category": "Car",
+    "category": "Fuel",
     "amount": "123",
     "user": "safar",
     "status": "active"
@@ -731,7 +731,7 @@
     "date": "2026-02-17",
     "type": "expense",
     "desc": "Car wash",
-    "category": "Car",
+    "category": "Car Wash",
     "amount": "10",
     "user": "safar",
     "status": "active"
@@ -852,7 +852,7 @@
     "date": "2026-02-27",
     "type": "expense",
     "desc": "Petrol",
-    "category": "Car",
+    "category": "Fuel",
     "amount": "113.01",
     "user": "safar",
     "status": "active"
@@ -1061,7 +1061,7 @@
     "date": "2026-03-09",
     "type": "expense",
     "desc": "Car wash",
-    "category": "Car",
+    "category": "Car Wash",
     "amount": "10",
     "user": "safar",
     "status": "active"
@@ -1127,7 +1127,7 @@
     "date": "2026-03-18",
     "type": "expense",
     "desc": "Car wash + tips",
-    "category": "Car",
+    "category": "Car Wash",
     "amount": "25",
     "user": "safar",
     "status": "active"
@@ -1204,7 +1204,7 @@
     "date": "2026-03-22",
     "type": "expense",
     "desc": "Petrol",
-    "category": "Car",
+    "category": "Fuel",
     "amount": "102",
     "user": "safar",
     "status": "active"
@@ -1338,6 +1338,17 @@
     "desc": "Inside Baku Azerbaijan Expenses",
     "category": "Travel",
     "amount": "651.50",
+    "user": "safar",
+    "status": "active"
+  },
+  {
+    "id": 1774443824070,
+    "createdAt": "2026-03-25T13:03:44.070Z",
+    "date": "2026-03-25",
+    "type": "expense",
+    "desc": "Father expenses (gift)",
+    "category": "India",
+    "amount": "392",
     "user": "safar",
     "status": "active"
   }
