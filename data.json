@@ -1171,7 +1171,7 @@
     "date": "2026-03-15",
     "type": "expense",
     "desc": "",
-    "category": "Car",
+    "category": "Fuel",
     "amount": "130",
     "user": "safar",
     "status": "active"
