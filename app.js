@@ -948,21 +948,44 @@ function filterTransactionsByYearMonth(transactions, selectedYear, selectedMonth
         return transactions;
     }
     
+    console.log('🔍 Enhanced debugging - checking each transaction:');
+    
     const filtered = transactions.filter(t => {
         if (!t.date) {
-            console.log('Transaction has no date:', t);
+            console.log('❌ Transaction has no date:', t);
             return false;
         }
+        
+        console.log(`🔍 Checking transaction ${t.id}: date="${t.date}"`);
+        
+        // Try to parse the date and show what we get
         const transactionDate = new Date(t.date);
+        console.log(`   Date object created:`, transactionDate);
+        console.log(`   Date parsing successful:`, !isNaN(transactionDate.getTime()));
+        
+        if (isNaN(transactionDate.getTime())) {
+            console.log(`   ❌ Failed to parse date: "${t.date}"`);
+            return false;
+        }
+        
         const transactionYear = transactionDate.getFullYear();
         const transactionMonth = transactionDate.getMonth() + 1; // 1-12
         
-        const matches = transactionYear === selectedYear && selectedMonths.includes(transactionMonth);
+        console.log(`   Parsed year: ${transactionYear}, month: ${transactionMonth}`);
+        console.log(`   Filter year: ${selectedYear}, filter months: [${selectedMonths.join(', ')}]`);
+        
+        const yearMatch = transactionYear === parseInt(selectedYear);
+        const monthMatch = selectedMonths.includes(transactionMonth);
+        
+        console.log(`   Year match: ${yearMatch}, Month match: ${monthMatch}`);
+        
+        const matches = yearMatch && monthMatch;
         if (matches) {
-            console.log('Transaction matches year/month filter:', {
-                id: t.id, date: t.date, year: transactionYear, month: transactionMonth
-            });
+            console.log(`   ✅ MATCH! Transaction ${t.id} matches year/month filter`);
+        } else {
+            console.log(`   ❌ NO MATCH for transaction ${t.id}`);
         }
+        
         return matches;
     });
     
