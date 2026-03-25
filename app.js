@@ -938,27 +938,52 @@ function filterTransactionsByDate(transactions, fromDate, toDate) {
 
 // Year/Month filtering helper function
 function filterTransactionsByYearMonth(transactions, selectedYear, selectedMonths) {
+    console.log('filterTransactionsByYearMonth called with:', {
+        totalTransactions: transactions.length,
+        selectedYear, selectedMonths
+    });
+    
     if (!selectedYear || !selectedMonths || selectedMonths.length === 0) {
+        console.log('No year/month filter active, returning all transactions');
         return transactions;
     }
     
-    return transactions.filter(t => {
-        if (!t.date) return false;
+    const filtered = transactions.filter(t => {
+        if (!t.date) {
+            console.log('Transaction has no date:', t);
+            return false;
+        }
         const transactionDate = new Date(t.date);
         const transactionYear = transactionDate.getFullYear();
         const transactionMonth = transactionDate.getMonth() + 1; // 1-12
         
-        return transactionYear === selectedYear && selectedMonths.includes(transactionMonth);
+        const matches = transactionYear === selectedYear && selectedMonths.includes(transactionMonth);
+        if (matches) {
+            console.log('Transaction matches year/month filter:', {
+                id: t.id, date: t.date, year: transactionYear, month: transactionMonth
+            });
+        }
+        return matches;
     });
+    
+    console.log('filterTransactionsByYearMonth result:', filtered.length);
+    return filtered;
 }
 
 // Combined filtering function that handles both date range and year/month filters
 function filterTransactionsCombined(transactions, fromDate, toDate, selectedYear, selectedMonths) {
+    console.log('filterTransactionsCombined called with:', {
+        totalTransactions: transactions.length,
+        fromDate, toDate, selectedYear, selectedMonths
+    });
+    
     // Filter by date range first
     let filteredByDate = filterTransactionsByDate(transactions, fromDate, toDate);
+    console.log('filteredByDate:', filteredByDate.length);
     
     // Filter by year/month
     let filteredByYearMonth = filterTransactionsByYearMonth(transactions, selectedYear, selectedMonths);
+    console.log('filteredByYearMonth:', filteredByYearMonth.length);
     
     // Combine results using OR logic (union of both filters)
     if (fromDate || toDate) {
@@ -968,17 +993,22 @@ function filterTransactionsCombined(transactions, fromDate, toDate, selectedYear
                 ...filteredByDate.map(t => t.id),
                 ...filteredByYearMonth.map(t => t.id)
             ]);
-            return transactions.filter(t => combinedIds.has(t.id));
+            const result = transactions.filter(t => combinedIds.has(t.id));
+            console.log('Both filters active - combined result:', result.length);
+            return result;
         } else {
             // Only date range filter active
+            console.log('Only date range filter active');
             return filteredByDate;
         }
     } else if (selectedYear && selectedMonths && selectedMonths.length > 0) {
         // Only year/month filter active
+        console.log('Only year/month filter active');
         return filteredByYearMonth;
     }
     
     // No filters active
+    console.log('No filters active');
     return transactions;
 }
 
