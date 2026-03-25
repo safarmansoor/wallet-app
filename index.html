@@ -118,6 +118,18 @@
                 </div>
             </div>
             <div class="input-group" style="margin-top: 20px;">
+                <h3 style="margin: 0 0 15px; font-size: 1rem;">Monthly Budget</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <input type="month" id="budget-month" placeholder="Select Month">
+                    <input type="number" id="budget-amount" placeholder="Budget Amount" step="0.01" inputmode="decimal">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button onclick="saveMonthlyBudget()" style="flex: 1;">Save Budget</button>
+                    <button onclick="loadMonthlyBudgets()" style="flex: 1; background: #6c757d;">Load Budgets</button>
+                </div>
+                <div id="budget-list" style="margin-top: 15px; max-height: 150px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 4px;"></div>
+            </div>
+            <div class="input-group" style="margin-top: 20px;">
                 <h3 style="margin: 0 0 15px; font-size: 1rem;">GitHub Setup</h3>
                 <input type="text" id="gh-username" placeholder="GitHub Username" onchange="saveGhSetting()">
                 <input type="text" id="gh-repo" placeholder="Repository Name" onchange="saveGhSetting()">

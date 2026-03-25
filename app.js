@@ -1,5 +1,159 @@
 
 
+// Budget data operations using monthlybudget.json file
+const budgetData = {
+    // Load budget data from monthlybudget.json file
+    load: async () => {
+        try {
+            const githubToken = getSetting('gh_token');
+            const githubUsername = getSetting('gh_username');
+            const githubRepo = getSetting('gh_repo');
+            const filename = 'monthlybudget.json';
+            
+            if (!githubToken || !githubUsername || !githubRepo) {
+                console.warn('GitHub credentials not configured for loading budget');
+                // Fallback to local monthlybudget.json if GitHub credentials not set
+                try {
+                    const response = await fetch('monthlybudget.json');
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data || {};
+                    }
+                } catch (e) {
+                    console.warn('Local monthlybudget.json also not available');
+                }
+                return {};
+            }
+            
+            // Fetch from GitHub API
+            const response = await fetch(`https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${filename}`, {
+                headers: {
+                    'Authorization': `token ${githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (!response.ok) {
+                // If GitHub authentication fails (401, 403), fall back to local monthlybudget.json
+                if (response.status === 401 || response.status === 403) {
+                    console.warn('GitHub authentication failed, falling back to local monthlybudget.json');
+                    try {
+                        const localResponse = await fetch('monthlybudget.json');
+                        if (localResponse.ok) {
+                            const data = await localResponse.json();
+                            return data || {};
+                        }
+                    } catch (e) {
+                        console.warn('Local monthlybudget.json also not available');
+                    }
+                }
+                throw new Error(`GitHub API Error: HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const fileData = await response.json();
+            const content = atob(fileData.content);
+            const data = JSON.parse(content);
+            return data || {};
+            
+        } catch (error) {
+            console.error('Error loading budget data from GitHub:', error);
+            // Try to load from local monthlybudget.json as final fallback
+            try {
+                const response = await fetch('monthlybudget.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    return data || {};
+                }
+            } catch (e) {
+                console.warn('Local monthlybudget.json also not available');
+            }
+            return {};
+        }
+    },
+    
+    // Save budget data to monthlybudget.json file
+    save: async (data) => {
+        try {
+            const githubToken = getSetting('gh_token');
+            const githubUsername = getSetting('gh_username');
+            const githubRepo = getSetting('gh_repo');
+            const filename = 'monthlybudget.json';
+            
+            if (!githubToken || !githubUsername || !githubRepo) {
+                console.warn('GitHub credentials not configured for saving budget');
+                return false;
+            }
+            
+            // Added cache: 'no-store' to prevent stale SHA errors on back-to-back saves
+            const fileResponse = await fetch(`https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${filename}`, {
+                headers: {
+                    'Authorization': `token ${githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                cache: 'no-store'
+            });
+            
+            let sha = null;
+            if (fileResponse.ok) {
+                const fileInfo = await fileResponse.json();
+                sha = fileInfo.sha;
+            }
+            
+            // Prepare data
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+            
+            // Build request body dynamically to avoid sending 'sha: null'
+            const requestBody = {
+                message: 'Update monthly budget via web app',
+                content: content,
+                branch: 'main' // NOTE: Change to 'master' if your GitHub repo uses master
+            };
+            
+            // Only attach the SHA if the file already exists
+            if (sha) {
+                requestBody.sha = sha;
+            }
+            
+            // Update file
+            const updateResponse = await fetch(`https://api.github.com/repos/${githubUsername}/${githubRepo}/contents/${filename}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            
+            if (updateResponse.ok) {
+                console.log('Budget data saved to GitHub successfully');
+                return true;
+            } else {
+                const error = await updateResponse.json();
+                console.error('GitHub budget save error:', error);
+                return false;
+            }
+            
+        } catch (error) {
+            console.error('Error saving budget to GitHub:', error);
+            return false;
+        }
+    },
+    
+    // Set monthly budget
+    setBudget: async (month, amount) => {
+        const data = await budgetData.load();
+        data[month] = parseFloat(amount);
+        return await budgetData.save(data);
+    },
+    
+    // Get monthly budget
+    getBudget: async (month) => {
+        const data = await budgetData.load();
+        return data[month] || 0;
+    }
+};
+
 // Data operations using GitHub data.json file
 const githubData = {
     // Load data from GitHub data.json file
@@ -531,6 +685,67 @@ window.saveSettings = function() {
     loadFromGitHub();
 }
 
+// Monthly Budget Management Functions
+window.saveMonthlyBudget = async function() {
+    const monthInput = document.getElementById('budget-month');
+    const amountInput = document.getElementById('budget-amount');
+    
+    if (!monthInput.value || !amountInput.value) {
+        alert('Please select a month and enter a budget amount');
+        return;
+    }
+    
+    const month = monthInput.value;
+    const amount = parseFloat(amountInput.value);
+    
+    if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid positive budget amount');
+        return;
+    }
+    
+    try {
+        const success = await budgetData.setBudget(month, amount);
+        if (success) {
+            alert(`Budget of ${formatAmount(amount)} AED saved for ${month}`);
+            loadMonthlyBudgets();
+            // Clear inputs after successful save
+            amountInput.value = '';
+        } else {
+            alert('Failed to save budget. Please check your connection and try again.');
+        }
+    } catch (error) {
+        console.error('Error saving monthly budget:', error);
+        alert('Error saving budget: ' + error.message);
+    }
+}
+
+window.loadMonthlyBudgets = async function() {
+    try {
+        const budgets = await budgetData.load();
+        const budgetList = document.getElementById('budget-list');
+        
+        if (Object.keys(budgets).length === 0) {
+            budgetList.innerHTML = '<p style="text-align:center; color:#999; margin:0;">No budgets set yet</p>';
+            return;
+        }
+        
+        let html = '<h4 style="margin:0 0 10px 0; font-size: 0.9rem; color:#666;">Saved Budgets:</h4>';
+        Object.entries(budgets).sort((a, b) => b[0].localeCompare(a[0])).forEach(([month, amount]) => {
+            const [year, monthNum] = month.split('-');
+            const monthName = new Date(year, monthNum - 1).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+            html += `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #eee;">
+                        <span>${monthName}</span>
+                        <span style="font-weight:bold;">${formatAmount(amount)} AED</span>
+                    </div>`;
+        });
+        
+        budgetList.innerHTML = html;
+    } catch (error) {
+        console.error('Error loading monthly budgets:', error);
+        document.getElementById('budget-list').innerHTML = `<p style="text-align:center; color:#dc3545;">Error loading budgets</p>`;
+    }
+}
+
 
 // Connection status management
 function updateConnectionStatus(status, text) {
@@ -674,7 +889,7 @@ async function saveToGitHub() {
 }
 
 
-function updateUI() {
+async function updateUI() {
     const trackUser = getTrackUser();
     // Filter transactions by user and exclude cancelled ones from main view
     const filtered = transactions.filter(t => (t.user || 'renu') === trackUser && (t.status || 'active') !== 'cancelled');
@@ -733,15 +948,57 @@ function updateUI() {
     });
     const ml = document.getElementById('month-list');
     ml.innerHTML = '';
-    Object.entries(monthTotals).sort((a, b) => b[0].localeCompare(a[0])).forEach(([month, total]) => {
+    
+    // Process month cards with async budget loading
+    const monthEntries = Object.entries(monthTotals).sort((a, b) => b[0].localeCompare(a[0]));
+    for (const [month, total] of monthEntries) {
         const it = document.createElement('div');
         it.className = 'month-card';
         const [y, m] = month.split('-');
         const monthName = new Date(y, m - 1).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-        // Since we only show expenses in reports, always display as negative
-        it.innerHTML = `<h3>${monthName}</h3><p class="negative" style="color: #dc3545">-${formatAmount(total)} AED</p>`;
+        
+        // Get budget for this month
+        const budget = await budgetData.getBudget(month);
+        const savings = budget - total;
+        const isOverBudget = savings < 0;
+        
+        // Create budget and savings display
+        let budgetHtml = '';
+        if (budget > 0) {
+            budgetHtml = `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
+                    <span style="color: #666;">Budget:</span>
+                    <span style="font-weight: bold;">${formatAmount(budget)} AED</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
+                    <span style="color: #666;">Expenses:</span>
+                    <span style="font-weight: bold; color: #dc3545;">-${formatAmount(total)} AED</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 5px;">
+                    <span style="color: #666;">Savings:</span>
+                    <span style="font-weight: bold; color: ${isOverBudget ? '#dc3545' : '#28a745'};">${isOverBudget ? '-' : '+'}${formatAmount(Math.abs(savings))} AED</span>
+                </div>
+            `;
+        } else {
+            budgetHtml = `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
+                    <span style="color: #666;">Budget:</span>
+                    <span style="font-weight: bold; color: #999;">Not Set</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
+                    <span style="color: #666;">Expenses:</span>
+                    <span style="font-weight: bold; color: #dc3545;">-${formatAmount(total)} AED</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 5px;">
+                    <span style="color: #666;">Savings:</span>
+                    <span style="font-weight: bold; color: #999;">N/A</span>
+                </div>
+            `;
+        }
+        
+        it.innerHTML = `<h3>${monthName}</h3>${budgetHtml}`;
         ml.appendChild(it);
-    });
+    }
 }
 
 function removeTransaction(idx) {
