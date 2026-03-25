@@ -715,8 +715,8 @@ function updateUI() {
     Object.entries(categoryTotals).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).forEach(([cat, total]) => {
         const it = document.createElement('div');
         it.className = 'category-item';
-        const isPos = total >= 0;
-        it.innerHTML = `<span>${cat}</span><span class="cat-amount ${isPos ? 'positive' : 'negative'}">${isPos ? '+' : '-'}${formatAmount(Math.abs(total))} AED</span>`;
+        // Since we only show expenses in reports, always display as negative
+        it.innerHTML = `<span>${cat}</span><span class="cat-amount negative">-${formatAmount(total)} AED</span>`;
         cl.appendChild(it);
     });
 
@@ -736,10 +736,10 @@ function updateUI() {
     Object.entries(monthTotals).sort((a, b) => b[0].localeCompare(a[0])).forEach(([month, total]) => {
         const it = document.createElement('div');
         it.className = 'month-card';
-        const isPos = total >= 0;
         const [y, m] = month.split('-');
         const monthName = new Date(y, m - 1).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-        it.innerHTML = `<h3>${monthName}</h3><p class="${isPos ? '' : ''}" style="color: ${isPos ? '#28a745' : '#dc3545'}">${isPos ? '+' : '-'}${formatAmount(Math.abs(total))} AED</p>`;
+        // Since we only show expenses in reports, always display as negative
+        it.innerHTML = `<h3>${monthName}</h3><p class="negative" style="color: #dc3545">-${formatAmount(total)} AED</p>`;
         ml.appendChild(it);
     });
 }
