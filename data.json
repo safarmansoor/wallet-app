@@ -610,7 +610,7 @@
     "date": "2026-02-15",
     "type": "expense",
     "desc": "Petrol",
-    "category": "Car",
+    "category": "Fuel",
     "amount": "123",
     "user": "safar",
     "status": "active"
@@ -852,7 +852,7 @@
     "date": "2026-02-27",
     "type": "expense",
     "desc": "Petrol",
-    "category": "Car",
+    "category": "Fuel",
     "amount": "113.01",
     "user": "safar",
     "status": "active"
@@ -1204,7 +1204,7 @@
     "date": "2026-03-22",
     "type": "expense",
     "desc": "Petrol",
-    "category": "Car",
+    "category": "Fuel",
     "amount": "102",
     "user": "safar",
     "status": "active"
