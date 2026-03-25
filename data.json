@@ -1351,5 +1351,16 @@
     "amount": "392",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774461952307,
+    "createdAt": "2026-03-25T18:05:52.307Z",
+    "date": "2026-03-25",
+    "type": "expense",
+    "desc": "Banana Oil Spinach Pickle Okrah",
+    "category": "Food",
+    "amount": "36.30",
+    "user": "safar",
+    "status": "active"
   }
 ]
