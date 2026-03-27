@@ -1362,5 +1362,16 @@
     "amount": "36.30",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774610913555,
+    "createdAt": "2026-03-27T11:28:33.555Z",
+    "date": "2026-03-27",
+    "type": "expense",
+    "desc": "Tomato palak milk orange juice",
+    "category": "Food",
+    "amount": "15.50",
+    "user": "safar",
+    "status": "active"
   }
 ]
