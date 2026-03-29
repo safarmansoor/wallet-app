@@ -1384,5 +1384,16 @@
     "amount": "10",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774792897198,
+    "createdAt": "2026-03-29T14:01:37.198Z",
+    "date": "2026-03-29",
+    "type": "expense",
+    "desc": "Taxi for leaving renu - rain time",
+    "category": "Transport",
+    "amount": "14",
+    "user": "safar",
+    "status": "active"
   }
 ]
