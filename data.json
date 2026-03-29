@@ -1373,5 +1373,16 @@
     "amount": "15.50",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774792875893,
+    "createdAt": "2026-03-29T14:01:15.893Z",
+    "date": "2026-03-29",
+    "type": "expense",
+    "desc": "Calling recharge",
+    "category": "Telecom",
+    "amount": "10",
+    "user": "safar",
+    "status": "active"
   }
 ]
