@@ -1428,5 +1428,16 @@
     "amount": "200",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774967532914,
+    "createdAt": "2026-03-31T14:32:12.914Z",
+    "date": "2026-03-31",
+    "type": "asset",
+    "desc": "",
+    "category": "Gold",
+    "amount": "6500",
+    "user": "renu",
+    "status": "active"
   }
 ]
