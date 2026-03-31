@@ -1417,5 +1417,16 @@
     "amount": "7",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1774960627196,
+    "createdAt": "2026-03-31T12:37:07.196Z",
+    "date": "2026-03-31",
+    "type": "income",
+    "desc": "Received back from Amir (100 remaining balance)",
+    "category": "Debt",
+    "amount": "200",
+    "user": "safar",
+    "status": "active"
   }
 ]
