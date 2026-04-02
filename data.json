@@ -1472,5 +1472,16 @@
     "amount": "18.17",
     "user": "safar",
     "status": "cancelled"
+  },
+  {
+    "id": 1775105772711,
+    "createdAt": "2026-04-02T04:56:12.711Z",
+    "date": "2026-04-01",
+    "type": "expense",
+    "desc": "Paneer anjeer walnut",
+    "category": "Food",
+    "amount": "18.27",
+    "user": "safar",
+    "status": "active"
   }
 ]
