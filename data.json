@@ -1461,5 +1461,16 @@
     "amount": "112.05",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775105752568,
+    "createdAt": "2026-04-02T04:55:52.568Z",
+    "date": "2026-04-02",
+    "type": "expense",
+    "desc": "Paneer anjeer walnut",
+    "category": "Good",
+    "amount": "18.17",
+    "user": "safar",
+    "status": "active"
   }
 ]
