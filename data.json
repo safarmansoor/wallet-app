@@ -1494,5 +1494,16 @@
     "amount": "17",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775226228170,
+    "createdAt": "2026-04-03T14:23:48.170Z",
+    "date": "2026-04-03",
+    "type": "expense",
+    "desc": "Veggies strawberry onion tomato",
+    "category": "Food",
+    "amount": "23.06",
+    "user": "safar",
+    "status": "active"
   }
 ]
