@@ -1483,5 +1483,16 @@
     "amount": "18.27",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775226199658,
+    "createdAt": "2026-04-03T14:23:19.658Z",
+    "date": "2026-04-03",
+    "type": "expense",
+    "desc": "Kefir 7-8, water",
+    "category": "Food",
+    "amount": "17",
+    "user": "safar",
+    "status": "active"
   }
 ]
