@@ -1505,5 +1505,16 @@
     "amount": "23.06",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775332012228,
+    "createdAt": "2026-04-04T19:46:52.228Z",
+    "date": "2026-04-01",
+    "type": "expense",
+    "desc": "Asema supermarket debt",
+    "category": "Food",
+    "amount": "50",
+    "user": "safar",
+    "status": "active"
   }
 ]
