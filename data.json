@@ -1516,5 +1516,16 @@
     "amount": "50",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775391111033,
+    "createdAt": "2026-04-05T12:11:51.033Z",
+    "date": "2026-04-05",
+    "type": "expense",
+    "desc": "Car wash",
+    "category": "Car",
+    "amount": "10",
+    "user": "safar",
+    "status": "active"
   }
 ]
