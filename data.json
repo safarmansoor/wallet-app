@@ -1560,5 +1560,16 @@
     "amount": "17.23",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775452564093,
+    "createdAt": "2026-04-06T05:16:04.093Z",
+    "date": "2026-04-05",
+    "type": "expense",
+    "desc": "Snacks for Amir",
+    "category": "Food",
+    "amount": "9",
+    "user": "safar",
+    "status": "active"
   }
 ]
