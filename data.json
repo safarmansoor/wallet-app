@@ -1571,5 +1571,16 @@
     "amount": "9",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775452661542,
+    "createdAt": "2026-04-06T05:17:41.542Z",
+    "date": "2026-04-06",
+    "type": "expense",
+    "desc": "",
+    "category": "Donation",
+    "amount": "50",
+    "user": "safar",
+    "status": "active"
   }
 ]
