@@ -1549,5 +1549,16 @@
     "amount": "15.45",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775452537370,
+    "createdAt": "2026-04-06T05:15:37.370Z",
+    "date": "2026-04-05",
+    "type": "expense",
+    "desc": "Porota milk",
+    "category": "Food",
+    "amount": "17.23",
+    "user": "safar",
+    "status": "active"
   }
 ]
