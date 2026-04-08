@@ -1582,5 +1582,16 @@
     "amount": "50",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775636830631,
+    "createdAt": "2026-04-08T08:27:10.631Z",
+    "date": "2026-04-07",
+    "type": "expense",
+    "desc": "Spinach pumpkin banana coffee bread raddish milk cabbage croissant sweet",
+    "category": "Food",
+    "amount": "47.01",
+    "user": "safar",
+    "status": "active"
   }
 ]
