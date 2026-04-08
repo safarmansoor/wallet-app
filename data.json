@@ -1593,5 +1593,16 @@
     "amount": "47.01",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775636921587,
+    "createdAt": "2026-04-08T08:28:41.587Z",
+    "date": "2026-04-08",
+    "type": "expense",
+    "desc": "Lights",
+    "category": "Room",
+    "amount": "9.75",
+    "user": "safar",
+    "status": "active"
   }
 ]
