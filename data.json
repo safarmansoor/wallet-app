@@ -1626,5 +1626,16 @@
     "amount": "2000",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1775762485582,
+    "createdAt": "2026-04-09T19:21:25.582Z",
+    "date": "2026-04-04",
+    "type": "expense",
+    "desc": "",
+    "category": "Telecom",
+    "amount": "50",
+    "user": "renu",
+    "status": "active"
   }
 ]
