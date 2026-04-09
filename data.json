@@ -1615,5 +1615,16 @@
     "amount": "94.06",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775761709030,
+    "createdAt": "2026-04-09T19:08:29.030Z",
+    "date": "2026-04-05",
+    "type": "expense",
+    "desc": "Flight ticket",
+    "category": "Transport",
+    "amount": "2000",
+    "user": "renu",
+    "status": "active"
   }
 ]
