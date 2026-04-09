@@ -1637,5 +1637,16 @@
     "amount": "50",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1775762552838,
+    "createdAt": "2026-04-09T19:22:32.838Z",
+    "date": "2026-04-07",
+    "type": "expense",
+    "desc": "Medicine piles",
+    "category": "Health",
+    "amount": "85",
+    "user": "safar",
+    "status": "active"
   }
 ]
