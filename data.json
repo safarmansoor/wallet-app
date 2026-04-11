@@ -1659,5 +1659,16 @@
     "amount": "168",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775914624463,
+    "createdAt": "2026-04-11T13:37:04.463Z",
+    "date": "2026-04-11",
+    "type": "expense",
+    "desc": "",
+    "category": "Parking",
+    "amount": "3",
+    "user": "safar",
+    "status": "active"
   }
 ]
