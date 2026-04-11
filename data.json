@@ -1670,5 +1670,16 @@
     "amount": "3",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775914635077,
+    "createdAt": "2026-04-11T13:37:15.077Z",
+    "date": "2026-04-11",
+    "type": "expense",
+    "desc": "Water",
+    "category": "Food",
+    "amount": "1",
+    "user": "safar",
+    "status": "active"
   }
 ]
