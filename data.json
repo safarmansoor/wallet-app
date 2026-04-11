@@ -1648,5 +1648,16 @@
     "amount": "85",
     "user": "safar",
     "status": "active"
+  },
+  {
+    "id": 1775897726600,
+    "createdAt": "2026-04-11T08:55:26.600Z",
+    "date": "2026-04-11",
+    "type": "expense",
+    "desc": "",
+    "category": "Fuel",
+    "amount": "168",
+    "user": "safar",
+    "status": "active"
   }
 ]
