@@ -83,25 +83,28 @@
                     <option value="income">Income (+)</option>
                     <option value="asset">Asset (-)</option>
                 </select>
-                <div class="category-pills">
-                    <button type="button" class="pill" data-category="Food">Food</button>
-                    <button type="button" class="pill" data-category="Parking">Parking</button>
-                    <button type="button" class="pill" data-category="Telecom">Telecom</button>
-                    <button type="button" class="pill" data-category="Travel">Travel</button>
-                    <button type="button" class="pill" data-category="India">India</button>
-                    <button type="button" class="pill" data-category="Health">Health</button>
-                    <button type="button" class="pill" data-category="Fuel">Fuel</button>
-                    <button type="button" class="pill" data-category="Debt">Debt</button>
-                    <button type="button" class="pill" data-category="Car">Car</button>
-                    <button type="button" class="pill" data-category="Transport">Transport</button>
-                    <button type="button" class="pill" data-category="Car Wash">Car Wash</button>
-                    <button type="button" class="pill" data-category="Entertainment">Entertainment</button>
-                    <button type="button" class="pill" data-category="Lotto">Lotto</button>
-                    <button type="button" class="pill" data-category="Fashion">Fashion</button>
-                    <button type="button" class="pill" data-category="Car Mods">Car Mods</button>
-                    <button type="button" class="pill" data-category="Room">Room</button>
-                    <button type="button" class="pill" data-category="Donation">Donation</button>
-                    <button type="button" class="pill" data-category="Utilities">Utilities</button>
+                <div class="form-group mb-2">
+                    <input type="text" id="category-input" class="form-control" placeholder="Enter category...">
+                </div>
+                <div class="category-pills mb-3" style="display: flex; flex-wrap: wrap; gap: 5px;">
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Food">Food</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Parking">Parking</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Telecom">Telecom</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Travel">Travel</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="India">India</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Health">Health</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Fuel">Fuel</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Debt">Debt</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Car">Car</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Transport">Transport</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Car Wash">Car Wash</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Entertainment">Entertainment</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Lotto">Lotto</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Fashion">Fashion</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Car Mods">Car Mods</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Room">Room</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Donation">Donation</button>
+                    <button type="button" class="btn btn-sm badge-pill badge-secondary" data-category="Utilities">Utilities</button>
                 </div>
                 <input type="hidden" id="category" value="">
                 <input type="number" id="amount" placeholder="Amount" step="0.01" inputmode="decimal" required>
