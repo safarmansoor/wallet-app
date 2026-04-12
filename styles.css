@@ -158,6 +158,33 @@ select {
     color: #2A231D;
 }
 
+.category-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.category-pills .pill {
+    padding: 8px 12px;
+    background: #FFFFFF;
+    border: 1px solid #2A231D;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.category-pills .pill:hover {
+    background: #e9ecef;
+}
+
+.category-pills .pill.active {
+    background: #B89758;
+    color: #2A231D;
+    border-color: #B89758;
+}
+
 input:focus,
 select:focus {
     outline: none;

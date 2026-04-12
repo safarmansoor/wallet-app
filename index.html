@@ -83,10 +83,27 @@
                     <option value="income">Income (+)</option>
                     <option value="asset">Asset (-)</option>
                 </select>
-                <input type="text" id="category" placeholder="Category (e.g. Food)" list="cat-suggestions">
-                <datalist id="cat-suggestions">
-                    <option value="Food"><option value="Transport"><option value="Salary"><option value="Utilities"><option value="Entertainment">
-                </datalist>
+                <div class="category-pills">
+                    <button type="button" class="pill" data-category="Food">Food</button>
+                    <button type="button" class="pill" data-category="Parking">Parking</button>
+                    <button type="button" class="pill" data-category="Telecom">Telecom</button>
+                    <button type="button" class="pill" data-category="Travel">Travel</button>
+                    <button type="button" class="pill" data-category="India">India</button>
+                    <button type="button" class="pill" data-category="Health">Health</button>
+                    <button type="button" class="pill" data-category="Fuel">Fuel</button>
+                    <button type="button" class="pill" data-category="Debt">Debt</button>
+                    <button type="button" class="pill" data-category="Car">Car</button>
+                    <button type="button" class="pill" data-category="Transport">Transport</button>
+                    <button type="button" class="pill" data-category="Car Wash">Car Wash</button>
+                    <button type="button" class="pill" data-category="Entertainment">Entertainment</button>
+                    <button type="button" class="pill" data-category="Lotto">Lotto</button>
+                    <button type="button" class="pill" data-category="Fashion">Fashion</button>
+                    <button type="button" class="pill" data-category="Car Mods">Car Mods</button>
+                    <button type="button" class="pill" data-category="Room">Room</button>
+                    <button type="button" class="pill" data-category="Donation">Donation</button>
+                    <button type="button" class="pill" data-category="Utilities">Utilities</button>
+                </div>
+                <input type="hidden" id="category" value="">
                 <input type="number" id="amount" placeholder="Amount" step="0.01" inputmode="decimal" required>
                 <input type="text" id="desc" placeholder="Description (optional)">
                 <button id="add-btn" type="button" onclick="addTransaction()">Add Transaction</button>

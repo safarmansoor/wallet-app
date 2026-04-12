@@ -1754,6 +1754,18 @@ function exportData() {
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
+    // Handle pill selection clicks
+    document.querySelectorAll('.category-pills .pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            // Clear previous selections
+            document.querySelectorAll('.category-pills .pill.active').forEach(p => p.classList.remove('active'));
+            // Set new selection
+            this.classList.add('active');
+            // Update hidden input
+            document.getElementById('category').value = this.dataset.category;
+        });
+    });
+    
     // Initialize year dropdown and month buttons
     populateYearDropdown();
     createMonthButtons();
