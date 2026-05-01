@@ -1703,5 +1703,16 @@
     "amount": "500",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1777622182457,
+    "createdAt": "2026-05-01T07:56:22.457Z",
+    "date": "2026-05-01",
+    "type": "income",
+    "desc": "",
+    "category": "Uncategorized",
+    "amount": "1400",
+    "user": "renu",
+    "status": "active"
   }
 ]
