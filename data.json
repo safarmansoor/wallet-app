@@ -1714,5 +1714,16 @@
     "amount": "1400",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1778868879674,
+    "createdAt": "2026-05-15T18:14:39.674Z",
+    "date": "2026-05-15",
+    "type": "expense",
+    "desc": "",
+    "category": "Uncategorized",
+    "amount": "800",
+    "user": "renu",
+    "status": "active"
   }
 ]
