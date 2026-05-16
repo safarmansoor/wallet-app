@@ -1725,5 +1725,16 @@
     "amount": "800",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1778913110958,
+    "createdAt": "2026-05-16T06:31:50.958Z",
+    "date": "2026-05-16",
+    "type": "expense",
+    "desc": "Baku final",
+    "category": "Travel",
+    "amount": "764",
+    "user": "renu",
+    "status": "active"
   }
 ]
