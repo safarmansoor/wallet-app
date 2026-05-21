@@ -1736,5 +1736,16 @@
     "amount": "764",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1779358976927,
+    "createdAt": "2026-05-21T10:22:56.927Z",
+    "date": "2026-05-21",
+    "type": "expense",
+    "desc": "",
+    "category": "Travel",
+    "amount": "500",
+    "user": "renu",
+    "status": "active"
   }
 ]
