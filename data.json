@@ -1758,5 +1758,16 @@
     "amount": "1100",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1782057649079,
+    "createdAt": "2026-06-21T16:00:49.079Z",
+    "date": "2026-06-21",
+    "type": "expense",
+    "desc": "For friend",
+    "category": "Uncategorized",
+    "amount": "200",
+    "user": "renu",
+    "status": "active"
   }
 ]
