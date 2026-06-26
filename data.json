@@ -1769,5 +1769,16 @@
     "amount": "200",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1782460476916,
+    "createdAt": "2026-06-26T07:54:36.916Z",
+    "date": "2026-06-26",
+    "type": "expense",
+    "desc": "Hospital",
+    "category": "Uncategorized",
+    "amount": "800",
+    "user": "renu",
+    "status": "active"
   }
 ]
