@@ -1780,5 +1780,16 @@
     "amount": "800",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1783846342159,
+    "createdAt": "2026-07-12T08:52:22.159Z",
+    "date": "2026-07-12",
+    "type": "expense",
+    "desc": "Mobile",
+    "category": "Uncategorized",
+    "amount": "1000",
+    "user": "renu",
+    "status": "active"
   }
 ]
