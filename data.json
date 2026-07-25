@@ -1802,5 +1802,16 @@
     "amount": "500",
     "user": "renu",
     "status": "active"
+  },
+  {
+    "id": 1785000329724,
+    "createdAt": "2026-07-25T17:25:29.724Z",
+    "date": "2026-07-25",
+    "type": "expense",
+    "desc": "No money",
+    "category": "Uncategorized",
+    "amount": "750",
+    "user": "renu",
+    "status": "active"
   }
 ]
